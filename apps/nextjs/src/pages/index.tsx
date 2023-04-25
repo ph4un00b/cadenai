@@ -4,6 +4,7 @@ import { signIn, signOut } from "next-auth/react";
 import { api } from "~/utils/api";
 
 function Home() {
+	const helloAi = api.ai.hi.useQuery();
 	return (
 		<>
 			<Head>
@@ -12,11 +13,19 @@ function Home() {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 			<main className="flex h-screen flex-col items-center bg-gradient-to-b from-[#230053] to-[#101225] text-slate-50">
-				<div className="container mt-12 flex flex-col items-center justify-center gap-4 px-4 py-8">
+				<div className="container flex flex-col items-center justify-center gap-4 px-4 py-8 mt-12">
 					<h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
 						<span className="text-pink-500">hola!</span>
 					</h1>
 					<AuthShowcase />
+
+					<section>
+						{helloAi.isLoading ? (
+							<p>thinking...</p>
+						) : (
+							<h2>AI: {helloAi.data?.payload}</h2>
+						)}
+					</section>
 				</div>
 			</main>
 		</>
@@ -36,13 +45,13 @@ const AuthShowcase: React.FC = () => {
 	return (
 		<div className="flex flex-col items-center justify-center gap-4">
 			{session?.user && (
-				<p className="text-center text-2xl text-white">
+				<p className="text-2xl text-center text-white">
 					{session && <span>Logged in as {session?.user?.name}</span>}
 					{secretMessage && <span> - {secretMessage}</span>}
 				</p>
 			)}
 			<button
-				className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+				className="px-10 py-3 font-semibold text-white no-underline transition rounded-full bg-white/10 hover:bg-white/20"
 				onClick={session ? () => void signOut() : () => void signIn()}
 			>
 				{session ? "Sign out" : "Sign in"}

@@ -9,5 +9,10 @@
   "cSpell.words": [
     "fau's",
     "phau"
-  ]
+  ],
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#3d2805",
+    "titleBar.activeBackground": "#b55909",
+    "titleBar.activeForeground": "#FCFAFE"
+  }
 }

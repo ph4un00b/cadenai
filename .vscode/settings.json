@@ -8,7 +8,12 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": [
     "fau's",
-    "phau"
+    "langchain",
+    "llms",
+    "NEXTAUTH",
+    "openai",
+    "phau",
+    "TRPC"
   ],
   "workbench.colorCustomizations": {
     "activityBar.background": "#3d2805",

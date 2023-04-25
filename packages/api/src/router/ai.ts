@@ -1,3 +1,4 @@
+import { LLMChain } from "langchain/chains";
 import { OpenAI } from "langchain/llms/openai";
 import { PromptTemplate } from "langchain/prompts";
 import { z } from "zod";
@@ -43,5 +44,20 @@ export const aiRouter = createTRPCRouter({
 		const fmtPrompt = await prompt.format({ product: "colorful socks" });
 		const res = await model.call(fmtPrompt);
 		return { payload: res };
+	}),
+	chain: publicProcedure.query(async () => {
+		const model = new OpenAI({
+			openAIApiKey: env.OPENAI_API_KEY,
+			temperature: 0.9,
+		});
+		const template = "What is a good name for a company that makes {product}?";
+		const prompt = new PromptTemplate({
+			template: template,
+			inputVariables: ["product"],
+		});
+
+		const chain = new LLMChain({ llm: model, prompt });
+		const { text } = await chain.call({ product: "colorful socks" });
+		return { payload: text as string };
 	}),
 });

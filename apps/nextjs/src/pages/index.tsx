@@ -6,6 +6,7 @@ import { api } from "~/utils/api";
 function Home() {
 	const call = api.ai.call.useQuery();
 	const template = api.ai.template.useQuery();
+	const chain = api.ai.chain.useQuery();
 	return (
 		<>
 			<Head>
@@ -29,10 +30,18 @@ function Home() {
 					</section>
 
 					<section>
-						{call.isLoading ? (
+						{template.isLoading ? (
 							<p>thinking...</p>
 						) : (
 							<h2>AI template-call: {template.data?.payload}</h2>
+						)}
+					</section>
+
+					<section>
+						{chain.isLoading ? (
+							<p>thinking...</p>
+						) : (
+							<h2>AI chain-call: {chain.data?.payload}</h2>
 						)}
 					</section>
 				</div>

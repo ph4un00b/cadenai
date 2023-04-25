@@ -5,48 +5,52 @@ import superjson from "superjson";
 import type { AppRouter } from "@acme/api";
 
 const getBaseUrl = () => {
-  if (typeof window !== "undefined") return ""; // browser should use relative url
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
+	if (typeof window !== "undefined") return ""; // browser should use relative url
+	if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
 
-  return `http://localhost:3000`; // dev SSR should use localhost
+	return `http://localhost:3000`; // dev SSR should use localhost
 };
 
 export const api = createTRPCNext<AppRouter>({
-  config() {
-    return {
-      queryClientConfig: {
-        defaultOptions: {
-          // @todo: avoiding too many request atm!
-          queries: {
-            enabled: true,
-            refetchOnWindowFocus: false,
-            refetchOnReconnect: false,
-            staleTime: Infinity,
-            cacheTime: Infinity,
-          },
-          mutations: {
-            enabled: true,
-            refetchOnWindowFocus: false,
-            refetchOnReconnect: false,
-            staleTime: Infinity,
-            cacheTime: Infinity,
-          },
-        },
-      },
-      transformer: superjson,
-      links: [
-        loggerLink({
-          enabled: (opts) =>
-            process.env.NODE_ENV === "development" ||
-            (opts.direction === "down" && opts.result instanceof Error),
-        }),
-        httpBatchLink({
-          url: `${getBaseUrl()}/api/trpc`,
-        }),
-      ],
-    };
-  },
-  ssr: false,
+	config() {
+		return {
+			queryClientConfig,
+			transformer: superjson,
+			links,
+		};
+	},
+	ssr: false,
 });
 
 export { type RouterInputs, type RouterOutputs } from "@acme/api";
+
+const queryClientConfig = {
+	defaultOptions: {
+		// @todo: avoiding too many request atm!
+		queries: {
+			enabled: true,
+			refetchOnWindowFocus: false,
+			refetchOnReconnect: false,
+			staleTime: Infinity,
+			cacheTime: Infinity,
+		},
+		mutations: {
+			enabled: true,
+			refetchOnWindowFocus: false,
+			refetchOnReconnect: false,
+			staleTime: Infinity,
+			cacheTime: Infinity,
+		},
+	},
+};
+
+const links = [
+	loggerLink({
+		enabled: (opts) =>
+			process.env.NODE_ENV === "development" ||
+			(opts.direction === "down" && opts.result instanceof Error),
+	}),
+	httpBatchLink({
+		url: `${getBaseUrl()}/api/trpc`,
+	}),
+];

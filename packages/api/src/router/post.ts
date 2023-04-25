@@ -1,6 +1,4 @@
-import { z } from "zod";
-
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter } from "../trpc";
 
 export const postRouter = createTRPCRouter({
 	// all: publicProcedure.query(({ ctx }) => {

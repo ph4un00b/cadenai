@@ -13,6 +13,9 @@
     "NEXTAUTH",
     "openai",
     "phau",
+    "phaubonacci",
+    "phaudecrypter",
+    "phauencrypter",
     "TRPC"
   ],
   "workbench.colorCustomizations": {

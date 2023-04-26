@@ -1,6 +1,9 @@
+import { initializeAgentExecutorWithOptions } from "langchain/agents";
 import { LLMChain } from "langchain/chains";
 import { OpenAI } from "langchain/llms/openai";
 import { PromptTemplate } from "langchain/prompts";
+import { DynamicTool, Tool } from "langchain/tools";
+import { Calculator } from "langchain/tools/calculator";
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
@@ -60,4 +63,107 @@ export const aiRouter = createTRPCRouter({
 		const { text } = await chain.call({ product: "colorful socks" });
 		return { payload: text as string };
 	}),
+	agent: publicProcedure.query(async () => {
+		const model = new OpenAI({
+			openAIApiKey: env.OPENAI_API_KEY,
+			temperature: 0,
+		});
+		const tools: Tool[] = [
+			new Calculator(),
+			new DynamicTool({
+				name: "phaubonacci",
+				description:
+					"call this when you want to calculate the phaubonacci. input should be a single number.",
+				func: async (input) => phaubonacci(Number(input)),
+			}),
+			new DynamicTool({
+				name: "phauencrypter",
+				description:
+					"call this when you want to use phauencrypter. input should be a string of characters.",
+				func: async (input) => phauencrypter(input),
+			}),
+			new DynamicTool({
+				name: "phaudecrypter",
+				description:
+					"call this when you want to use phaudecrypter. input should be a string of characters.",
+				func: async (input) => phaudecrypter(input),
+			}),
+		];
+
+		const executor = await initializeAgentExecutorWithOptions(tools, model, {
+			agentType: "zero-shot-react-description",
+		});
+
+		console.log("Loaded agent.");
+
+		const input =
+			"apply me the phaudecrypter for hola mundo! and append to the result the phaubonacci of 10";
+		console.log(`Executing with input "${input}"...`);
+
+		const { output } = await executor.call({ input });
+		// console.log({ output });
+		return { payload: output as string };
+	}),
 });
+
+function phaubonacci(input: number): string {
+	const emojis = ["😀", "😂", "😎", "🤔", "🤣", "😍", "🤩", "😜", "🥳"];
+	let result = "";
+
+	for (let i = 0; i < input; i++) {
+		const emojisIndex = Math.floor(Math.random() * emojis.length);
+		const emoji = emojis[emojisIndex];
+
+		result += `fau${emoji}`;
+	}
+
+	return result;
+}
+
+function phauencrypter(input: string) {
+	const vowelMap: { [key: string]: string } = {
+		a: "4",
+		e: "3",
+		i: "1",
+		o: "0",
+		u: "_",
+	};
+
+	const reversedChars = input.split("").reverse();
+
+	const mappedChars = reversedChars.map((char) => {
+		const lowerChar = char.toLowerCase();
+		return vowelMap[lowerChar] || char;
+	});
+
+	return mappedChars.join("");
+}
+
+function phaudecrypter(input: string): string {
+	const vowelMap: { [key: string]: string } = {
+		"4": "a",
+		"3": "e",
+		"1": "i",
+		"0": "o",
+		_: "u",
+	};
+
+	const reversedChars = input.split("").reverse();
+
+	const mappedChars = reversedChars.map((char) => {
+		const lowerChar = char.toLowerCase();
+		return vowelMap[lowerChar] || char;
+	});
+
+	return mappedChars.join("");
+}
+
+class MyTool extends Tool {
+	name = "My Tool";
+	description = "A tool that does something...";
+
+	async _call(arg: string | undefined) {
+		// Do something with the input...
+		return "Success!";
+	}
+}

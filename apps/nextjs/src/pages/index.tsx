@@ -7,6 +7,7 @@ function Home() {
 	const call = api.ai.call.useQuery();
 	const template = api.ai.template.useQuery();
 	const chain = api.ai.chain.useQuery();
+	const agent = api.ai.agent.useQuery();
 	return (
 		<>
 			<Head>
@@ -42,6 +43,14 @@ function Home() {
 							<p>thinking...</p>
 						) : (
 							<h2>AI chain-call: {chain.data?.payload}</h2>
+						)}
+					</section>
+
+					<section>
+						{agent.isLoading ? (
+							<p>thinking...</p>
+						) : (
+							<h2>AI agent-call: {agent.data?.payload}</h2>
 						)}
 					</section>
 				</div>

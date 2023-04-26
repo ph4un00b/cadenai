@@ -74,19 +74,19 @@ export const aiRouter = createTRPCRouter({
 				name: "phaubonacci",
 				description:
 					"call this when you want to calculate the phaubonacci. input should be a single number.",
-				func: async (input) => phaubonacci(Number(input)),
+				func: async (input) => Promise.resolve(phaubonacci(Number(input))),
 			}),
 			new DynamicTool({
 				name: "phauencrypter",
 				description:
 					"call this when you want to use phauencrypter. input should be a string of characters.",
-				func: async (input) => phauencrypter(input),
+				func: async (input) => Promise.resolve(phauencrypter(input)),
 			}),
 			new DynamicTool({
 				name: "phaudecrypter",
 				description:
 					"call this when you want to use phaudecrypter. input should be a string of characters.",
-				func: async (input) => phaudecrypter(input),
+				func: async (input) => Promise.resolve(phaudecrypter(input)),
 			}),
 		];
 
@@ -158,12 +158,12 @@ function phaudecrypter(input: string): string {
 	return mappedChars.join("");
 }
 
-class MyTool extends Tool {
+class _MyTool extends Tool {
 	name = "My Tool";
 	description = "A tool that does something...";
 
-	async _call(arg: string | undefined) {
+	async _call() {
 		// Do something with the input...
-		return "Success!";
+		return Promise.resolve("Success!");
 	}
 }

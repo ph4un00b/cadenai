@@ -1,6 +1,7 @@
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
-import { LLMChain } from "langchain/chains";
+import { ConversationChain, LLMChain } from "langchain/chains";
 import { OpenAI } from "langchain/llms/openai";
+import { BufferMemory } from "langchain/memory";
 import { PromptTemplate } from "langchain/prompts";
 import { DynamicTool, Tool } from "langchain/tools";
 import { Calculator } from "langchain/tools/calculator";
@@ -24,88 +25,156 @@ if (!parsed.success) {
 const env = Object.freeze(parsed.data);
 
 export const aiRouter = createTRPCRouter({
-	call: publicProcedure.query(async () => {
-		const llm = new OpenAI({
-			openAIApiKey: env.OPENAI_API_KEY,
-			temperature: 0.9,
-		});
-		const res = await llm.call(
-			"What would be a good company name a company that makes colorful socks?",
-		);
-		return { payload: res };
-	}),
-	template: publicProcedure.query(async () => {
-		const llm = new OpenAI({
-			openAIApiKey: env.OPENAI_API_KEY,
-			temperature: 0.9,
-		});
-
-		const prompt = new PromptTemplate({
-			template: "What is a good name for a company that makes {product}?",
-			inputVariables: ["product"],
-		});
-
-		const fmtPrompt = await prompt.format({ product: "colorful socks" });
-		const res = await llm.call(fmtPrompt);
-		return { payload: res };
-	}),
-	chain: publicProcedure.query(async () => {
-		const llm = new OpenAI({
-			openAIApiKey: env.OPENAI_API_KEY,
-			temperature: 0.9,
-		});
-
-		const prompt = new PromptTemplate({
-			template: "What is a good name for a company that makes {product}?",
-			inputVariables: ["product"],
-		});
-
-		const chain = new LLMChain({ llm, prompt });
-		const { text } = await chain.call({ product: "colorful socks" });
-		return { payload: text as string };
-	}),
-	agent: publicProcedure.query(async () => {
-		const llm = new OpenAI({
-			openAIApiKey: env.OPENAI_API_KEY,
-			temperature: 0,
-		});
-		const tools: Tool[] = [
-			new Calculator(),
-			new DynamicTool({
-				name: "phaubonacci",
-				description:
-					"call this when you want to calculate the phaubonacci. input should be a single number.",
-				func: async (input) => Promise.resolve(phaubonacci(Number(input))),
+	call: publicProcedure
+		.output(
+			z.object({
+				payload: z.string(),
 			}),
-			new DynamicTool({
-				name: "phauencrypter",
-				description:
-					"call this when you want to use phauencrypter. input should be a string of characters.",
-				func: async (input) => Promise.resolve(phauencrypter(input)),
+		)
+		.query(async () => {
+			const llm = new OpenAI({
+				openAIApiKey: env.OPENAI_API_KEY,
+				temperature: 0.9,
+			});
+			const res = await llm.call(
+				"What would be a good company name a company that makes colorful socks?",
+			);
+			return { payload: res };
+		}),
+	template: publicProcedure
+		.output(
+			z.object({
+				payload: z.string(),
 			}),
-			new DynamicTool({
-				name: "phaudecrypter",
-				description:
-					"call this when you want to use phaudecrypter. input should be a string of characters.",
-				func: async (input) => Promise.resolve(phaudecrypter(input)),
+		)
+		.query(async () => {
+			const llm = new OpenAI({
+				openAIApiKey: env.OPENAI_API_KEY,
+				temperature: 0.9,
+			});
+
+			const prompt = new PromptTemplate({
+				template: "What is a good name for a company that makes {product}?",
+				inputVariables: ["product"],
+			});
+
+			const fmtPrompt = await prompt.format({ product: "colorful socks" });
+			const res = await llm.call(fmtPrompt);
+			return { payload: res };
+		}),
+	chain: publicProcedure
+		.output(
+			z.object({
+				payload: z.string(),
 			}),
-		];
+		)
+		.query(async () => {
+			const llm = new OpenAI({
+				openAIApiKey: env.OPENAI_API_KEY,
+				temperature: 0.9,
+			});
 
-		const executor = await initializeAgentExecutorWithOptions(tools, llm, {
-			agentType: "zero-shot-react-description",
-			verbose: true,
-		});
+			const prompt = new PromptTemplate({
+				template: "What is a good name for a company that makes {product}?",
+				inputVariables: ["product"],
+			});
 
-		console.log("Loaded agent.");
+			const chain = new LLMChain({ llm, prompt });
+			const { text } = await chain.call({ product: "colorful socks" });
+			return { payload: text as string };
+		}),
+	agent: publicProcedure
+		.output(
+			z.object({
+				payload: z.string(),
+			}),
+		)
+		.query(async () => {
+			const llm = new OpenAI({
+				openAIApiKey: env.OPENAI_API_KEY,
+				temperature: 0,
+			});
+			const tools: Tool[] = [
+				new Calculator(),
+				new DynamicTool({
+					name: "phaubonacci",
+					description:
+						"call this when you want to calculate the phaubonacci. input should be a single number.",
+					func: async (input) => Promise.resolve(phaubonacci(Number(input))),
+				}),
+				new DynamicTool({
+					name: "phauencrypter",
+					description:
+						"call this when you want to use phauencrypter. input should be a string of characters.",
+					func: async (input) => Promise.resolve(phauencrypter(input)),
+				}),
+				new DynamicTool({
+					name: "phaudecrypter",
+					description:
+						"call this when you want to use phaudecrypter. input should be a string of characters.",
+					func: async (input) => Promise.resolve(phaudecrypter(input)),
+				}),
+			];
 
-		const input =
-			"apply me the phaudecrypter for hola mundo! and append to the result the phaubonacci of 10";
-		console.log(`Executing with input "${input}"...`);
+			const executor = await initializeAgentExecutorWithOptions(tools, llm, {
+				agentType: "zero-shot-react-description",
+				verbose: true,
+			});
 
-		const { output } = await executor.call({ input });
-		// console.log({ output });
-		return { payload: output as string };
-	}),
+			console.log("Loaded agent.");
+
+			const input =
+				"apply me the phaudecrypter for hola mundo! and append to the result the phaubonacci of 10";
+			console.log(`Executing with input "${input}"...`);
+
+			const { output } = await executor.call({ input });
+			// console.log({ output });
+			return { payload: output as string };
+		}),
+	memory: publicProcedure
+		.output(
+			z.object({
+				payload: z.string(),
+			}),
+		)
+		.query(async () => {
+			// llm = OpenAI((temperature = 0));
+			const llm = new OpenAI({
+				openAIApiKey: env.OPENAI_API_KEY,
+				temperature: 0,
+			});
+			const memory = new BufferMemory();
+			// conversation = ConversationChain((llm = llm), (verbose = True));
+			const chain = new ConversationChain({ llm, memory, verbose: true });
+			const res1 = await chain.call({
+				input: "Hi! I'm faunicolas cage del futuro!",
+			});
+			// output = conversation.predict((input = "Hi there!"));
+			const { response } = res1;
+			return { payload: response as string };
+		}),
+	memory2: publicProcedure
+		.output(
+			z.object({
+				payload: z.string(),
+			}),
+		)
+		.query(async () => {
+			const llm = new OpenAI({
+				openAIApiKey: env.OPENAI_API_KEY,
+				temperature: 0,
+			});
+			/**
+			 * @abstract
+			 * we need a way to preserve memory in a stateless
+			 * environment
+			 */
+			const memory = new BufferMemory();
+			const chain = new ConversationChain({ llm, memory, verbose: true });
+			const res2 = await chain.call({ input: "What's my name?" });
+			const { response } = res2;
+			return { payload: response as string };
+		}),
 });
 
 function phaubonacci(input: number): string {

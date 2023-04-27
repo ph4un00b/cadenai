@@ -1,13 +1,10 @@
+import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { signIn, signOut } from "next-auth/react";
 
 import { api } from "~/utils/api";
 
 function Home() {
-	const call = api.ai.call.useQuery();
-	const template = api.ai.template.useQuery();
-	const chain = api.ai.chain.useQuery();
-	const agent = api.ai.agent.useQuery();
 	return (
 		<>
 			<Head>
@@ -22,40 +19,118 @@ function Home() {
 					</h1>
 					<AuthShowcase />
 
-					<section>
-						{call.isLoading ? (
-							<p>thinking...</p>
-						) : (
-							<h2>AI call: {call.data?.payload}</h2>
-						)}
-					</section>
-
-					<section>
-						{template.isLoading ? (
-							<p>thinking...</p>
-						) : (
-							<h2>AI template-call: {template.data?.payload}</h2>
-						)}
-					</section>
-
-					<section>
-						{chain.isLoading ? (
-							<p>thinking...</p>
-						) : (
-							<h2>AI chain-call: {chain.data?.payload}</h2>
-						)}
-					</section>
-
-					<section>
-						{agent.isLoading ? (
-							<p>thinking...</p>
-						) : (
-							<h2>AI agent-call: {agent.data?.payload}</h2>
-						)}
-					</section>
+					<Query />
+					<Template />
+					<Chain />
+					<Agent />
+					<Memory />
 				</div>
 			</main>
 		</>
+	);
+}
+
+function Memory() {
+	const [recall, setRecall] = useState(false);
+	const memory = api.ai.memory.useQuery();
+
+	useTimeout(() => {
+		setRecall(true);
+	}, 6000);
+
+	return (
+		<>
+			<section>
+				{memory.isLoading ? (
+					<p>thinking...</p>
+				) : (
+					<h2>AI memory-call: {memory.data?.payload}</h2>
+				)}
+			</section>
+			{recall ? <Memory2 /> : <p>waiting...</p>}
+		</>
+	);
+}
+
+function useTimeout(callback: () => void, delay: number) {
+	const savedCallback = useRef<() => void>(null!);
+
+	useEffect(() => {
+		savedCallback.current = callback;
+	});
+
+	useEffect(() => {
+		function tick() {
+			savedCallback.current();
+		}
+
+		const id = window.setTimeout(tick, delay);
+		return () => window.clearTimeout(id);
+	}, [delay]);
+}
+
+function Memory2() {
+	const memory = api.ai.memory2.useQuery();
+	return (
+		<section>
+			{memory.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<h2>AI memory2-call: {memory.data?.payload}</h2>
+			)}
+		</section>
+	);
+}
+
+function Agent() {
+	const agent = api.ai.agent.useQuery();
+	return (
+		<section>
+			{agent.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<h2>AI agent-call: {agent.data?.payload}</h2>
+			)}
+		</section>
+	);
+}
+
+function Chain() {
+	const chain = api.ai.chain.useQuery();
+	return (
+		<section>
+			{chain.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<h2>AI chain-call: {chain.data?.payload}</h2>
+			)}
+		</section>
+	);
+}
+
+function Query() {
+	const call = api.ai.call.useQuery();
+	return (
+		<section>
+			{call.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<h2>AI call: {call.data?.payload}</h2>
+			)}
+		</section>
+	);
+}
+
+function Template() {
+	const template = api.ai.template.useQuery();
+	return (
+		<section>
+			{template.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<h2>AI template-call: {template.data?.payload}</h2>
+			)}
+		</section>
 	);
 }
 

@@ -25,46 +25,47 @@ const env = Object.freeze(parsed.data);
 
 export const aiRouter = createTRPCRouter({
 	call: publicProcedure.query(async () => {
-		const model = new OpenAI({
+		const llm = new OpenAI({
 			openAIApiKey: env.OPENAI_API_KEY,
 			temperature: 0.9,
 		});
-		const res = await model.call(
+		const res = await llm.call(
 			"What would be a good company name a company that makes colorful socks?",
 		);
 		return { payload: res };
 	}),
 	template: publicProcedure.query(async () => {
-		const model = new OpenAI({
+		const llm = new OpenAI({
 			openAIApiKey: env.OPENAI_API_KEY,
 			temperature: 0.9,
 		});
-		const template = "What is a good name for a company that makes {product}?";
+
 		const prompt = new PromptTemplate({
-			template: template,
-			inputVariables: ["product"],
-		});
-		const fmtPrompt = await prompt.format({ product: "colorful socks" });
-		const res = await model.call(fmtPrompt);
-		return { payload: res };
-	}),
-	chain: publicProcedure.query(async () => {
-		const model = new OpenAI({
-			openAIApiKey: env.OPENAI_API_KEY,
-			temperature: 0.9,
-		});
-		const template = "What is a good name for a company that makes {product}?";
-		const prompt = new PromptTemplate({
-			template: template,
+			template: "What is a good name for a company that makes {product}?",
 			inputVariables: ["product"],
 		});
 
-		const chain = new LLMChain({ llm: model, prompt });
+		const fmtPrompt = await prompt.format({ product: "colorful socks" });
+		const res = await llm.call(fmtPrompt);
+		return { payload: res };
+	}),
+	chain: publicProcedure.query(async () => {
+		const llm = new OpenAI({
+			openAIApiKey: env.OPENAI_API_KEY,
+			temperature: 0.9,
+		});
+
+		const prompt = new PromptTemplate({
+			template: "What is a good name for a company that makes {product}?",
+			inputVariables: ["product"],
+		});
+
+		const chain = new LLMChain({ llm, prompt });
 		const { text } = await chain.call({ product: "colorful socks" });
 		return { payload: text as string };
 	}),
 	agent: publicProcedure.query(async () => {
-		const model = new OpenAI({
+		const llm = new OpenAI({
 			openAIApiKey: env.OPENAI_API_KEY,
 			temperature: 0,
 		});
@@ -90,8 +91,9 @@ export const aiRouter = createTRPCRouter({
 			}),
 		];
 
-		const executor = await initializeAgentExecutorWithOptions(tools, model, {
+		const executor = await initializeAgentExecutorWithOptions(tools, llm, {
 			agentType: "zero-shot-react-description",
+			verbose: true,
 		});
 
 		console.log("Loaded agent.");

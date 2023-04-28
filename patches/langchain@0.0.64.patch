@@ -1,0 +1,12 @@
+diff --git a/dist/memory/buffer_memory.js b/dist/memory/buffer_memory.js
+index 638f3c4a22b98dc7c3318ca486075309e75cbcb1..f0acd4abe87c5539ca4f5585d1ccc62eb4b38bf2 100644
+--- a/dist/memory/buffer_memory.js
++++ b/dist/memory/buffer_memory.js
+@@ -2,6 +2,7 @@ import { getBufferString } from "./base.js";
+ import { BaseChatMemory } from "./chat_memory.js";
+ export class BufferMemory extends BaseChatMemory {
+     constructor(fields) {
++        console.log("jamon!!! (❁´◡`❁)😁😀")
+         super({
+             chatHistory: fields?.chatHistory,
+             returnMessages: fields?.returnMessages ?? false,

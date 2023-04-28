@@ -19,10 +19,10 @@ function Home() {
 					</h1>
 					<AuthShowcase />
 
-					<Query />
+					{/* <Query />
 					<Template />
 					<Chain />
-					<Agent />
+					<Agent /> */}
 					<Memory />
 				</div>
 			</main>

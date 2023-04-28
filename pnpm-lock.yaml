@@ -1,5 +1,10 @@
 lockfileVersion: '6.0'
 
+patchedDependencies:
+  langchain@0.0.64:
+    hash: qtmepqgtckdti5u6m2jn2s4wfm
+    path: patches/langchain@0.0.64.patch
+
 importers:
 
   .:
@@ -169,7 +174,7 @@ importers:
         version: 10.20.0
       langchain:
         specifier: ^0.0.64
-        version: 0.0.64
+        version: 0.0.64(patch_hash=qtmepqgtckdti5u6m2jn2s4wfm)
       next:
         specifier: ^13.3.0
         version: 13.3.0(@babel/core@7.21.4)(react-dom@18.2.0)(react@18.2.0)
@@ -6745,7 +6750,7 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /langchain@0.0.64:
+  /langchain@0.0.64(patch_hash=qtmepqgtckdti5u6m2jn2s4wfm):
     resolution: {integrity: sha512-EPR5igtuSemtPAesQ8oa8SF/xjTA+bYJW00JNJ/8PYkPNiU+uc+cifOEH3H/DFam+oDY9XhR7WV+GhBEskVNNA==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -6849,6 +6854,7 @@ packages:
       - debug
       - encoding
     dev: false
+    patched: true
 
   /language-subtag-registry@0.3.22:
     resolution: {integrity: sha512-tN0MCzyWnoz/4nHS6uxdlFWoUZT7ABptwKPQ52Ea7URk6vll88bWBVhodtnlfEuCcKWNGoc+uGbw1cwa9IKh/w==}

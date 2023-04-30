@@ -13,13 +13,16 @@
     "hola",
     "langchain",
     "llms",
+    "lpush",
+    "lrange",
     "NEXTAUTH",
     "openai",
     "phau",
     "phaubonacci",
     "phaudecrypter",
     "phauencrypter",
-    "TRPC"
+    "TRPC",
+    "upstash"
   ],
   "workbench.colorCustomizations": {
     "activityBar.background": "#3d2805",

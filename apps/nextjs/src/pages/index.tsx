@@ -20,20 +20,56 @@ function Home() {
 					</h1>
 					<AuthShowcase />
 
-					{/* <Query />
+					<Query />
 					<Template />
 					<Chain />
-					<Agent /> */}
+					<Agent />
 					<Memory />
+					<Redis />
 				</div>
 			</main>
 		</>
 	);
 }
 
-function Memory() {
+function Redis() {
+	const redis = api.ai.redis.useQuery();
 	const [recall, setRecall] = useState(false);
+
+	useTimeout(() => {
+		setRecall(true);
+	}, 6000);
+
+	return (
+		<>
+			<section>
+				{redis.isLoading ? (
+					<p>thinking...</p>
+				) : (
+					<h2>AI redis-call: {redis.data?.payload}</h2>
+				)}
+			</section>
+			{recall ? <Redis2 /> : <p>waiting...</p>}
+		</>
+	);
+}
+
+function Redis2() {
+	const memory = api.ai.redis2.useQuery();
+	return (
+		<section>
+			{memory.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<h2>AI redis2-call: {memory.data?.payload}</h2>
+			)}
+		</section>
+	);
+}
+
+function Memory() {
 	const memory = api.ai.memory.useQuery();
+	const [recall, setRecall] = useState(false);
 
 	useTimeout(() => {
 		setRecall(true);

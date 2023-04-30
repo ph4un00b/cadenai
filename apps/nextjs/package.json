@@ -22,6 +22,7 @@
     "@trpc/next": "^10.20.0",
     "@trpc/react-query": "^10.20.0",
     "@trpc/server": "^10.20.0",
+    "@upstash/redis": "^1.20.4",
     "langchain": "^0.0.64",
     "next": "^13.3.0",
     "next-auth": "^4.22.0",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@acme/eslint-config": "^0.1.0",
+    "@total-typescript/ts-reset": "^0.4.2",
     "@types/node": "^18.15.11",
     "@types/react": "^18.0.37",
     "@types/react-dom": "^18.0.11",

@@ -8,9 +8,12 @@ import { Calculator } from "langchain/tools/calculator";
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { RedisMemory } from "../utils/langchain.redis_memory";
 
 const schema = z.object({
 	OPENAI_API_KEY: z.string(),
+	REDIS_ENDPOINT: z.string().url(),
+	REDIS_TOKEN: z.string(),
 	DEV_MODE: z.coerce.boolean(),
 });
 
@@ -26,11 +29,7 @@ const env = Object.freeze(parsed.data);
 
 export const aiRouter = createTRPCRouter({
 	call: publicProcedure
-		.output(
-			z.object({
-				payload: z.string(),
-			}),
-		)
+		.output(z.object({ payload: z.string() }))
 		.query(async () => {
 			const llm = new OpenAI({
 				openAIApiKey: env.OPENAI_API_KEY,
@@ -42,11 +41,7 @@ export const aiRouter = createTRPCRouter({
 			return { payload: res };
 		}),
 	template: publicProcedure
-		.output(
-			z.object({
-				payload: z.string(),
-			}),
-		)
+		.output(z.object({ payload: z.string() }))
 		.query(async () => {
 			const llm = new OpenAI({
 				openAIApiKey: env.OPENAI_API_KEY,
@@ -63,11 +58,7 @@ export const aiRouter = createTRPCRouter({
 			return { payload: res };
 		}),
 	chain: publicProcedure
-		.output(
-			z.object({
-				payload: z.string(),
-			}),
-		)
+		.output(z.object({ payload: z.string() }))
 		.query(async () => {
 			const llm = new OpenAI({
 				openAIApiKey: env.OPENAI_API_KEY,
@@ -84,11 +75,7 @@ export const aiRouter = createTRPCRouter({
 			return { payload: text as string };
 		}),
 	agent: publicProcedure
-		.output(
-			z.object({
-				payload: z.string(),
-			}),
-		)
+		.output(z.object({ payload: z.string() }))
 		.query(async () => {
 			const llm = new OpenAI({
 				openAIApiKey: env.OPENAI_API_KEY,
@@ -132,11 +119,7 @@ export const aiRouter = createTRPCRouter({
 			return { payload: output as string };
 		}),
 	memory: publicProcedure
-		.output(
-			z.object({
-				payload: z.string(),
-			}),
-		)
+		.output(z.object({ payload: z.string() }))
 		.query(async () => {
 			// llm = OpenAI((temperature = 0));
 			const llm = new OpenAI({
@@ -154,11 +137,7 @@ export const aiRouter = createTRPCRouter({
 			return { payload: response as string };
 		}),
 	memory2: publicProcedure
-		.output(
-			z.object({
-				payload: z.string(),
-			}),
-		)
+		.output(z.object({ payload: z.string() }))
 		.query(async () => {
 			const llm = new OpenAI({
 				openAIApiKey: env.OPENAI_API_KEY,
@@ -171,6 +150,48 @@ export const aiRouter = createTRPCRouter({
 			 */
 			const memory = new BufferMemory();
 			const chain = new ConversationChain({ llm, memory, verbose: true });
+			const res2 = await chain.call({ input: "What's my name?" });
+			const { response } = res2;
+			return { payload: response as string };
+		}),
+	redis: publicProcedure
+		.output(z.object({ payload: z.string() }))
+		.query(async () => {
+			const llm = new OpenAI({
+				openAIApiKey: env.OPENAI_API_KEY,
+				temperature: 0,
+			});
+
+			const memory = new RedisMemory(
+				{ url: env.REDIS_ENDPOINT, token: env.REDIS_TOKEN },
+				{ sessionId: "user-id", memoryTTL: 3000 },
+			);
+
+			await memory.init();
+
+			const chain = new ConversationChain({ llm, memory, verbose: !true });
+			const res1 = await chain.call({
+				input: "Hi! I'm faunicolas cage del futuro!",
+			});
+
+			const { response } = res1;
+			return { payload: response as string };
+		}),
+	redis2: publicProcedure
+		.output(z.object({ payload: z.string() }))
+		.query(async () => {
+			const llm = new OpenAI({
+				openAIApiKey: env.OPENAI_API_KEY,
+				temperature: 0,
+			});
+			const memory = new RedisMemory(
+				{ url: env.REDIS_ENDPOINT, token: env.REDIS_TOKEN },
+				{ sessionId: "user-id" },
+			);
+
+			await memory.init();
+			await memory.loadMemoryVariables({});
+			const chain = new ConversationChain({ llm, memory, verbose: !true });
 			const res2 = await chain.call({ input: "What's my name?" });
 			const { response } = res2;
 			return { payload: response as string };

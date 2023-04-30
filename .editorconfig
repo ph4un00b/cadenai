@@ -18,6 +18,6 @@ indent_style = tab
 # ala linux!
 indent_size = 2
 # yml is a very special guy ¯\_( ͡° ͜ʖ ͡°)_/¯
-[*.yml]
+[*{.json,.yml}]
 indent_style = space
 indent_size = 2

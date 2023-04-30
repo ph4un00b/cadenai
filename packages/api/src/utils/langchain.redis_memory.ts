@@ -38,32 +38,26 @@ export type RedisMemoryInput = BaseChatMemoryInput & {
 const schema = z.array(z.object({ role: z.string(), content: z.string() }));
 
 export class RedisMemory extends BaseChatMemory {
-	client: Redis;
-
-	memoryKey = "history";
-
-	sessionId: string;
-
-	memoryTTL = 300;
+	private readonly client: Redis;
+	private readonly memoryKey: string;
+	private readonly sessionId: string;
+	private readonly memoryTTL: number;
 
 	constructor(clientOpts: RedisConfigNodejs, fields: RedisMemoryInput) {
 		const {
-			memoryKey,
+			memoryKey = "history",
 			sessionId,
-			memoryTTL,
-			returnMessages,
-			inputKey,
-			outputKey,
-			chatHistory,
+			memoryTTL = 300,
+			...rest
 		} = fields;
-		super({ returnMessages, inputKey, outputKey, chatHistory });
-		this.memoryKey = memoryKey ?? this.memoryKey;
+		super(rest);
+		this.memoryKey = memoryKey;
 		this.sessionId = this.memoryKey + sessionId;
-		this.memoryTTL = memoryTTL ?? this.memoryTTL;
+		this.memoryTTL = memoryTTL;
 		this.client = new Redis(clientOpts);
 	}
 
-	get memoryKeys(): string[] {
+	get memoryKeys() {
 		return [this.memoryKey];
 	}
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { signIn, signOut } from "next-auth/react";

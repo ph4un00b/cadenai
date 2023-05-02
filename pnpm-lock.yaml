@@ -2,7 +2,7 @@ lockfileVersion: '6.0'
 
 patchedDependencies:
   langchain@0.0.64:
-    hash: qtmepqgtckdti5u6m2jn2s4wfm
+    hash: 3yjuf3azk2qzngrfsixacahefq
     path: patches/langchain@0.0.64.patch
 
 importers:
@@ -157,6 +157,9 @@ importers:
       '@acme/tailwind-config':
         specifier: ^0.1.0
         version: link:../../packages/config/tailwind
+      '@planetscale/database':
+        specifier: ^1.7.0
+        version: 1.7.0
       '@tanstack/react-query':
         specifier: ^4.29.2
         version: 4.29.2(react-dom@18.2.0)(react-native@0.71.7)(react@18.2.0)
@@ -177,7 +180,7 @@ importers:
         version: 1.20.4
       langchain:
         specifier: ^0.0.64
-        version: 0.0.64(patch_hash=qtmepqgtckdti5u6m2jn2s4wfm)
+        version: 0.0.64(patch_hash=3yjuf3azk2qzngrfsixacahefq)
       next:
         specifier: ^13.3.0
         version: 13.3.0(@babel/core@7.21.4)(react-dom@18.2.0)(react@18.2.0)
@@ -2456,6 +2459,11 @@ packages:
       picocolors: 1.0.0
       tiny-glob: 0.2.9
       tslib: 2.5.0
+    dev: false
+
+  /@planetscale/database@1.7.0:
+    resolution: {integrity: sha512-lWR6biXChUyQnxsT4RT1CIeR3ZJvwTQXiQ+158MnY3VjLwjHEGakDzdH9kwUGPk6CHvu6UeqRXp1DgUOVHJFTw==}
+    engines: {node: '>=16'}
     dev: false
 
   /@prisma/client@4.13.0(prisma@4.13.0):
@@ -6777,7 +6785,7 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /langchain@0.0.64(patch_hash=qtmepqgtckdti5u6m2jn2s4wfm):
+  /langchain@0.0.64(patch_hash=3yjuf3azk2qzngrfsixacahefq):
     resolution: {integrity: sha512-EPR5igtuSemtPAesQ8oa8SF/xjTA+bYJW00JNJ/8PYkPNiU+uc+cifOEH3H/DFam+oDY9XhR7WV+GhBEskVNNA==}
     engines: {node: '>=18'}
     peerDependencies:

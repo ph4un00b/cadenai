@@ -89,6 +89,8 @@ export class RedisMemory extends BaseChatMemory {
 
 	async loadMemoryVariables(_values: InputValues) {
 		const messages = await this.chatHistory.getMessages();
+		console.log({ messages });
+
 		if (this.returnMessages) return { [this.memoryKey]: messages };
 		return { [this.memoryKey]: getBufferString(messages) };
 	}

@@ -10,3 +10,38 @@ index 638f3c4a22b98dc7c3318ca486075309e75cbcb1..f0acd4abe87c5539ca4f5585d1ccc62e
          super({
              chatHistory: fields?.chatHistory,
              returnMessages: fields?.returnMessages ?? false,
+diff --git a/dist/prompts/template.js b/dist/prompts/template.js
+index a5c23576132b58425341dd3ac7bfd35cdbee8843..82d29460da73319663b11e368e5f0d7584b0395c 100644
+--- a/dist/prompts/template.js
++++ b/dist/prompts/template.js
+@@ -46,15 +46,22 @@ export const parseFString = (template) => {
+     }
+     return nodes;
+ };
+-export const interpolateFString = (template, values) => parseFString(template).reduce((res, node) => {
+-    if (node.type === "variable") {
+-        if (node.name in values) {
+-            return res + values[node.name];
++export const interpolateFString = (template, values) => {
++    const parsed = parseFString(template)
++    console.log({template})
++
++    return parsed.reduce((res, node) => {
++        if (node.type === "variable") {
++            if (node.name in values) {
++                console.log(`✨ ${node.name}: ${values[node.name]}`)
++                return res + values[node.name];
++            }
++            throw new Error(`Missing value for input ${node.name}`);
+         }
+-        throw new Error(`Missing value for input ${node.name}`);
+-    }
+-    return res + node.text;
+-}, "");
++        return res + node.text;
++    }, "");
++}
++
+ export const DEFAULT_FORMATTER_MAPPING = {
+     "f-string": interpolateFString,
+     jinja2: (_, __) => "",

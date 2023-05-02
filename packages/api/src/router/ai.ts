@@ -8,6 +8,7 @@ import { Calculator } from "langchain/tools/calculator";
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { MySQLMemory } from "../utils/langchain.planetscale_memory";
 import { RedisMemory } from "../utils/langchain.redis_memory";
 
 const schema = z.object({
@@ -15,6 +16,9 @@ const schema = z.object({
 	REDIS_ENDPOINT: z.string().url(),
 	REDIS_TOKEN: z.string(),
 	DEV_MODE: z.coerce.boolean(),
+	DATABASE_HOST: z.string(),
+	DATABASE_USER: z.string(),
+	DATABASE_PASS: z.string(),
 });
 
 const parsed = schema.safeParse(process.env);
@@ -193,6 +197,56 @@ export const aiRouter = createTRPCRouter({
 			await memory.loadMemoryVariables({});
 			const chain = new ConversationChain({ llm, memory, verbose: !true });
 			const res2 = await chain.call({ input: "What's my name?" });
+			const { response } = res2;
+			return { payload: response as string };
+		}),
+	mysql: publicProcedure
+		.output(z.object({ payload: z.string() }))
+		.query(async () => {
+			const llm = new OpenAI({
+				openAIApiKey: env.OPENAI_API_KEY,
+				temperature: 0,
+			});
+
+			const memory = new MySQLMemory(
+				{
+					host: env.DATABASE_HOST,
+					username: env.DATABASE_USER,
+					password: env.DATABASE_PASS,
+				},
+				{ sessionId: "user-id", memoryTTL: 3000 },
+			);
+			await memory.init();
+
+			const chain = new ConversationChain({ llm, memory, verbose: !true, });
+			const res1 = await chain.call({
+				input: "Hi! I'm faunicolas cage del futuro!",
+			});
+
+			const { response } = res1;
+			return { payload: response as string };
+		}),
+	mysql2: publicProcedure
+		.output(z.object({ payload: z.string() }))
+		.query(async () => {
+			const llm = new OpenAI({
+				openAIApiKey: env.OPENAI_API_KEY,
+				temperature: 0,
+			});
+
+			const memory = new MySQLMemory(
+				{
+					host: env.DATABASE_HOST,
+					username: env.DATABASE_USER,
+					password: env.DATABASE_PASS,
+				},
+				{ sessionId: "user-id", memoryTTL: 3000 },
+			);
+			await memory.init();
+			await memory.loadMemoryVariables({});
+			const chain = new ConversationChain({ llm, memory, verbose: !true });
+			const res2 = await chain.call({ input: "What's my name?" });
+
 			const { response } = res2;
 			return { payload: response as string };
 		}),

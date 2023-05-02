@@ -25,9 +25,45 @@ function Home() {
 					<Agent />
 					<Memory />
 					<Redis />
+					<MemoryMysql />
 				</div>
 			</main>
 		</>
+	);
+}
+
+function MemoryMysql() {
+	const mysql = api.ai.mysql.useQuery();
+	const [recall, setRecall] = useState(false);
+
+	useTimeout(() => {
+		setRecall(true);
+	}, 6000);
+
+	return (
+		<>
+			<section>
+				{mysql.isLoading ? (
+					<p>thinking...</p>
+				) : (
+					<h2>AI mysql-call: {mysql.data?.payload}</h2>
+				)}
+			</section>
+			{recall ? <Memory2Mysql /> : <p>waiting...</p>}
+		</>
+	);
+}
+
+function Memory2Mysql() {
+	const mysql2 = api.ai.mysql2.useQuery();
+	return (
+		<section>
+			{mysql2.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<h2>AI mysql2-call: {mysql2.data?.payload}</h2>
+			)}
+		</section>
 	);
 }
 

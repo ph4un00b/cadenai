@@ -54,9 +54,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 	// Get the session from the server using the unstable_getServerSession wrapper function
 	const session = await getServerSession({ req, res });
 
-	return createInnerTRPCContext({
-		session,
-	});
+	return createInnerTRPCContext({ session });
 };
 
 /**
@@ -68,14 +66,12 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 const t = initTRPC.context<typeof createTRPCContext>().create({
 	transformer: superjson,
 	errorFormatter({ shape, error }) {
-		return {
-			...shape,
-			data: {
-				...shape.data,
-				zodError:
-					error.cause instanceof ZodError ? error.cause.flatten() : null,
-			},
+		const data = {
+			...shape.data,
+			zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
 		};
+		const formatted = { ...shape, data };
+		return formatted;
 	},
 });
 

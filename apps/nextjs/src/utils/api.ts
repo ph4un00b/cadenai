@@ -1,3 +1,4 @@
+import { type QueryClientConfig } from "@tanstack/react-query";
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import superjson from "superjson";
@@ -24,10 +25,12 @@ export const api = createTRPCNext<AppRouter>({
 
 export { type RouterInputs, type RouterOutputs } from "@acme/api";
 
-const queryClientConfig = {
+const queryClientConfig: QueryClientConfig = {
 	defaultOptions: {
-		// @todo: avoiding too many request atm!
+		// @todo: avoiding too many retries atm!
+		// maybe change this on prod
 		queries: {
+			retry: false,
 			enabled: true,
 			refetchOnWindowFocus: false,
 			refetchOnReconnect: false,
@@ -35,10 +38,11 @@ const queryClientConfig = {
 			cacheTime: Infinity,
 		},
 		mutations: {
-			enabled: true,
-			refetchOnWindowFocus: false,
-			refetchOnReconnect: false,
-			staleTime: Infinity,
+			retry: false,
+			// enabled: true,
+			// refetchOnWindowFocus: false,
+			// refetchOnReconnect: false,
+			// staleTime: Infinity,
 			cacheTime: Infinity,
 		},
 	},

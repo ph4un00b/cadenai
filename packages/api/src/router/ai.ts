@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
 import { ConversationChain, LLMChain } from "langchain/chains";
 import { OpenAI } from "langchain/llms/openai";
@@ -10,6 +11,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { MySQLMemory } from "../utils/langchain.planetscale_memory";
 import { RedisMemory } from "../utils/langchain.redis_memory";
+import { UpstashCache } from "../utils/langchain.upstash_cache";
 
 const schema = z.object({
 	OPENAI_API_KEY: z.string(),
@@ -34,16 +36,7 @@ const env = Object.freeze(parsed.data);
 export const aiRouter = createTRPCRouter({
 	call: publicProcedure
 		.output(z.object({ payload: z.string() }))
-		.query(async () => {
-			const llm = new OpenAI({
-				openAIApiKey: env.OPENAI_API_KEY,
-				temperature: 0.9,
-			});
-			const res = await llm.call(
-				"What would be a good company name a company that makes colorful socks?",
-			);
-			return { payload: res };
-		}),
+		.query(llmCall),
 	template: publicProcedure
 		.output(z.object({ payload: z.string() }))
 		.query(async () => {
@@ -188,6 +181,7 @@ export const aiRouter = createTRPCRouter({
 				openAIApiKey: env.OPENAI_API_KEY,
 				temperature: 0,
 			});
+
 			const memory = new RedisMemory(
 				{ url: env.REDIS_ENDPOINT, token: env.REDIS_TOKEN },
 				{ sessionId: "user-id" },
@@ -218,7 +212,7 @@ export const aiRouter = createTRPCRouter({
 			);
 			await memory.init();
 
-			const chain = new ConversationChain({ llm, memory, verbose: !true, });
+			const chain = new ConversationChain({ llm, memory, verbose: !true });
 			const res1 = await chain.call({
 				input: "Hi! I'm faunicolas cage del futuro!",
 			});
@@ -251,6 +245,33 @@ export const aiRouter = createTRPCRouter({
 			return { payload: response as string };
 		}),
 });
+
+async function llmCall() {
+	const cache = new UpstashCache({
+		url: env.REDIS_ENDPOINT,
+		token: env.REDIS_TOKEN,
+	});
+	const llm = new OpenAI({
+		cache,
+		openAIApiKey: env.OPENAI_API_KEY,
+		temperature: 0.9,
+		maxRetries: 1,
+		// maxConcurrency
+	});
+	try {
+		const res = await llm.call(
+			"What would be a good company name a company that makes colorful socks?",
+		);
+		return { payload: res };
+	} catch (err) {
+		throw new TRPCError({
+			code: "TOO_MANY_REQUESTS",
+			message: "An unexpected error occurred, please try again later.",
+			// optional: pass the original error to retain stack trace
+			cause: err,
+		});
+	}
+}
 
 function phaubonacci(input: number): string {
 	const emojis = ["😀", "😂", "😎", "🤔", "🤣", "😍", "🤩", "😜", "🥳"];

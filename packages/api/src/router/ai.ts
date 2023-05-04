@@ -40,9 +40,16 @@ export const aiRouter = createTRPCRouter({
 	template: publicProcedure
 		.output(z.object({ payload: z.string() }))
 		.query(async () => {
+			const cache = new UpstashCache({
+				url: env.REDIS_ENDPOINT,
+				token: env.REDIS_TOKEN,
+			});
 			const llm = new OpenAI({
+				cache,
 				openAIApiKey: env.OPENAI_API_KEY,
 				temperature: 0.9,
+				maxRetries: 1,
+				// maxConcurrency
 			});
 
 			const prompt = new PromptTemplate({
@@ -57,9 +64,17 @@ export const aiRouter = createTRPCRouter({
 	chain: publicProcedure
 		.output(z.object({ payload: z.string() }))
 		.query(async () => {
+			const cache = new UpstashCache({
+				url: env.REDIS_ENDPOINT,
+				token: env.REDIS_TOKEN,
+			});
+
 			const llm = new OpenAI({
+				cache,
 				openAIApiKey: env.OPENAI_API_KEY,
 				temperature: 0.9,
+				maxRetries: 1,
+				// maxConcurrency
 			});
 
 			const prompt = new PromptTemplate({
@@ -74,9 +89,17 @@ export const aiRouter = createTRPCRouter({
 	agent: publicProcedure
 		.output(z.object({ payload: z.string() }))
 		.query(async () => {
+			const cache = new UpstashCache({
+				url: env.REDIS_ENDPOINT,
+				token: env.REDIS_TOKEN,
+			});
+
 			const llm = new OpenAI({
+				cache,
 				openAIApiKey: env.OPENAI_API_KEY,
 				temperature: 0,
+				maxRetries: 1,
+				// maxConcurrency
 			});
 			const tools: Tool[] = [
 				new Calculator(),
@@ -118,10 +141,17 @@ export const aiRouter = createTRPCRouter({
 	memory: publicProcedure
 		.output(z.object({ payload: z.string() }))
 		.query(async () => {
-			// llm = OpenAI((temperature = 0));
+			const cache = new UpstashCache({
+				url: env.REDIS_ENDPOINT,
+				token: env.REDIS_TOKEN,
+			});
+
 			const llm = new OpenAI({
+				cache,
 				openAIApiKey: env.OPENAI_API_KEY,
 				temperature: 0,
+				maxRetries: 1,
+				// maxConcurrency
 			});
 			const memory = new BufferMemory();
 			// conversation = ConversationChain((llm = llm), (verbose = True));
@@ -136,9 +166,17 @@ export const aiRouter = createTRPCRouter({
 	memory2: publicProcedure
 		.output(z.object({ payload: z.string() }))
 		.query(async () => {
+			const cache = new UpstashCache({
+				url: env.REDIS_ENDPOINT,
+				token: env.REDIS_TOKEN,
+			});
+
 			const llm = new OpenAI({
+				cache,
 				openAIApiKey: env.OPENAI_API_KEY,
 				temperature: 0,
+				maxRetries: 1,
+				// maxConcurrency
 			});
 			/**
 			 * @abstract
@@ -154,9 +192,17 @@ export const aiRouter = createTRPCRouter({
 	redis: publicProcedure
 		.output(z.object({ payload: z.string() }))
 		.query(async () => {
+			const cache = new UpstashCache({
+				url: env.REDIS_ENDPOINT,
+				token: env.REDIS_TOKEN,
+			});
+
 			const llm = new OpenAI({
+				cache,
 				openAIApiKey: env.OPENAI_API_KEY,
 				temperature: 0,
+				maxRetries: 1,
+				// maxConcurrency
 			});
 
 			const memory = new RedisMemory(
@@ -177,9 +223,17 @@ export const aiRouter = createTRPCRouter({
 	redis2: publicProcedure
 		.output(z.object({ payload: z.string() }))
 		.query(async () => {
+			const cache = new UpstashCache({
+				url: env.REDIS_ENDPOINT,
+				token: env.REDIS_TOKEN,
+			});
+
 			const llm = new OpenAI({
+				cache,
 				openAIApiKey: env.OPENAI_API_KEY,
 				temperature: 0,
+				maxRetries: 1,
+				// maxConcurrency
 			});
 
 			const memory = new RedisMemory(
@@ -197,9 +251,17 @@ export const aiRouter = createTRPCRouter({
 	mysql: publicProcedure
 		.output(z.object({ payload: z.string() }))
 		.query(async () => {
+			const cache = new UpstashCache({
+				url: env.REDIS_ENDPOINT,
+				token: env.REDIS_TOKEN,
+			});
+
 			const llm = new OpenAI({
+				cache,
 				openAIApiKey: env.OPENAI_API_KEY,
 				temperature: 0,
+				maxRetries: 1,
+				// maxConcurrency
 			});
 
 			const memory = new MySQLMemory(
@@ -223,9 +285,17 @@ export const aiRouter = createTRPCRouter({
 	mysql2: publicProcedure
 		.output(z.object({ payload: z.string() }))
 		.query(async () => {
+			const cache = new UpstashCache({
+				url: env.REDIS_ENDPOINT,
+				token: env.REDIS_TOKEN,
+			});
+
 			const llm = new OpenAI({
+				cache,
 				openAIApiKey: env.OPENAI_API_KEY,
 				temperature: 0,
+				maxRetries: 1,
+				// maxConcurrency
 			});
 
 			const memory = new MySQLMemory(

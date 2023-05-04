@@ -89,11 +89,16 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 export const createTRPCRouter = t.router;
 
 const logger = t.middleware(async ({ path, type, next }) => {
-	const callName = `${path}-${type}😱`;
-	console.time(callName);
-	const result = await next();
-	console.timeEnd(callName);
+	const start = performance.now();
 
+	// const callName = `${path}-${type}😱`;
+	// console.time(callName);
+	const result = await next();
+	// console.timeEnd(callName);
+
+	const end = performance.now();
+	const elapsed = end - start;
+	console.log(`😱 ${path}-${type} Elapsed time: ${elapsed} milliseconds`);
 	return result;
 });
 

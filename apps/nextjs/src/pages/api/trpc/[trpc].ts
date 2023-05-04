@@ -23,7 +23,7 @@ export default createNextApiHandler({
 				}`,
 			);
 		}
-		// console.error("Something went wrong", error);
+		console.error("Something went wrong", error);
 	},
 });
 

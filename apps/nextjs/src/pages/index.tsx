@@ -20,12 +20,13 @@ function Home() {
 					<AuthShowcase />
 
 					<Query />
-					{/* <Template />
+					<Template />
 					<Chain />
 					<Agent />
 					<Memory />
 					<Redis />
-					<MemoryMysql /> */}
+					{/* @todo: fix sql prompt! */}
+					{/* <MemoryMysql /> */}
 				</div>
 			</main>
 		</>

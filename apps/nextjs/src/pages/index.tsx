@@ -33,7 +33,7 @@ function Home() {
 	);
 }
 
-function MemoryMysql() {
+function _MemoryMysql() {
 	const mysql = api.ai.mysql.useQuery();
 	const [recall, setRecall] = useState(false);
 

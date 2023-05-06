@@ -26,11 +26,11 @@ export class UpstashCache extends BaseCache {
 	}
 
 	public async lookup(prompt: string, llmKey: string) {
-		console.log({ prompt, llmKey });
-
 		let idx = 0;
 		let key = getCacheKey(prompt, llmKey, String(idx));
 		let value = await this.redisClient.get<string>(key);
+		// console.log({ key: "👀👀👀👀👀👀", prompt, llmKey });
+		console.log({ state: "👀👀👀👀👀👀", key, llmKey });
 		console.log({ value });
 		const generations: Generation[] = [];
 
@@ -49,6 +49,7 @@ export class UpstashCache extends BaseCache {
 	}
 
 	public async update(prompt: string, llmKey: string, value: Generation[]) {
+		console.log({ key: "🐋🐋🐋🐋🐋🐋", llmKey });
 		for (const [i, val] of value.entries()) {
 			const key = getCacheKey(prompt, llmKey, String(i));
 			await this.redisClient.set(key, val.text);

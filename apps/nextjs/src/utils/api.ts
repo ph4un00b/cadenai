@@ -1,5 +1,10 @@
 import { type QueryClientConfig } from "@tanstack/react-query";
-import { httpBatchLink, loggerLink } from "@trpc/client";
+import {
+	createWSClient,
+	httpBatchLink,
+	loggerLink,
+	wsLink,
+} from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import superjson from "superjson";
 
@@ -12,6 +17,12 @@ const getBaseUrl = () => {
 	return `http://localhost:3000`; // dev SSR should use localhost
 };
 
+const getBaseWebSocketUrl = () => {
+	if (process.env.NEXT_PUBLIC_WS_URL)
+		return `https://${process.env.NEXT_PUBLIC_WS_URL}`;
+	return `ws://localhost:3011`;
+};
+
 export const api = createTRPCNext<AppRouter>({
 	config() {
 		return {
@@ -22,6 +33,32 @@ export const api = createTRPCNext<AppRouter>({
 	},
 	ssr: false,
 });
+
+// create persistent WebSocket connection
+/**
+ * @see https://trpc.io/docs/subscriptions#setting-trpcclient-to-use-websockets
+ * @abstract
+ * testing out nextjs limits!
+ *
+ * you should deploy on stateful environment.
+ */
+const wsClient = createWSClient({
+	url: getBaseWebSocketUrl(),
+});
+
+const links = [
+	loggerLink({
+		enabled: (opts) =>
+			process.env.NODE_ENV === "development" ||
+			(opts.direction === "down" && opts.result instanceof Error),
+	}),
+	httpBatchLink({
+		url: `${getBaseUrl()}/api/trpc`,
+	}),
+	wsLink({
+		client: wsClient,
+	}),
+];
 
 export { type RouterInputs, type RouterOutputs } from "@acme/api";
 
@@ -47,14 +84,3 @@ const queryClientConfig: QueryClientConfig = {
 		},
 	},
 };
-
-const links = [
-	loggerLink({
-		enabled: (opts) =>
-			process.env.NODE_ENV === "development" ||
-			(opts.direction === "down" && opts.result instanceof Error),
-	}),
-	httpBatchLink({
-		url: `${getBaseUrl()}/api/trpc`,
-	}),
-];

@@ -1,4 +1,4 @@
-import { Client, type Config, type Connection } from "@planetscale/database";
+import { type Config, type Connection } from "@planetscale/database";
 import {
 	BaseChatMemory,
 	getBufferString,
@@ -28,7 +28,7 @@ export type MySQLMemoryInput = BaseChatMemoryInput & {
 const schema = z.array(z.object({ role: z.string(), content: z.string() }));
 
 export class MySQLMemory extends BaseChatMemory {
-	private readonly db: Connection;
+	private db?: Connection;
 	private readonly memoryTable: string;
 	private readonly LLM: string;
 	private readonly sessionId: string;
@@ -36,7 +36,10 @@ export class MySQLMemory extends BaseChatMemory {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private readonly memorySchema: z.ZodObject<any, any, any, any>;
 
-	constructor(configOpts: Config, readonly fields: MySQLMemoryInput) {
+	constructor(
+		private readonly configOpts: Config,
+		readonly fields: MySQLMemoryInput,
+	) {
 		const {
 			memoryTable = "ChatHistoryLLM",
 			LLM = "OpenAI",
@@ -60,17 +63,24 @@ export class MySQLMemory extends BaseChatMemory {
 			finishedAt: z.enum(["datetime"]),
 			updatedAt: z.enum(["timestamp"]),
 		});
-
-		this.db = new Client({
-			host: configOpts.host,
-			username: configOpts.username,
-			password: configOpts.password,
-		}).connection();
 		console.log("contructor-end");
 	}
 
 	get memoryKeys() {
 		return ["history"];
+	}
+	async initialize() {
+		/**
+		 * @abstract
+		 * changed to dynamic import due to wsServer compilation
+		 * @see https://github.com/planetscale/database-js/issues/67
+		 */
+		const { Client } = await import("@planetscale/database");
+		this.db = new Client({
+			host: this.configOpts.host,
+			username: this.configOpts.username,
+			password: this.configOpts.password,
+		}).connection();
 	}
 	// +---------------+---------------+-----------------+-------------+------------------+----------------+-------------+-----------+--------------------------+------------------------+-------------------+---------------+--------------------+--------------------+--------------------+-----------------+------------+----------------+---------------------------------+----------------+-----------------------+--------+
 	// | TABLE_CATALOG | TABLE_SCHEMA  | TABLE_NAME      | COLUMN_NAME | ORDINAL_POSITION | COLUMN_DEFAULT | IS_NULLABLE | DATA_TYPE | CHARACTER_MAXIMUM_LENGTH | CHARACTER_OCTET_LENGTH | NUMERIC_PRECISION | NUMERIC_SCALE | DATETIME_PRECISION | CHARACTER_SET_NAME | COLLATION_NAME     | COLUMN_TYPE     | COLUMN_KEY | EXTRA          | PRIVILEGES                      | COLUMN_COMMENT | GENERATION_EXPRESSION | SRS_ID |
@@ -78,6 +88,7 @@ export class MySQLMemory extends BaseChatMemory {
 	// | def           | flux-database | TableName	     | id          |                1 | NULL           | NO          | bigint    |                     NULL |                   NULL |                20 |             0 |               NULL | NULL               | NULL               | bigint unsigned | PRI        | auto_increment | select,insert,update,references |                |                       |   NULL |
 	// +---------------+---------------+-----------------+-------------+------------------+----------------+-------------+-----------+--------------------------+------------------------+-------------------+---------------+--------------------+--------------------+--------------------+-----------------+------------+----------------+---------------------------------+----------------+-----------------------+--------+
 	async init() {
+		if (!this.db) throw new Error("db not initialized");
 		try {
 			const { rows } = await this.db.execute(
 				`SELECT COLUMN_NAME, DATA_TYPE
@@ -145,6 +156,7 @@ export class MySQLMemory extends BaseChatMemory {
 	}
 
 	async saveContext(inputValues: InputValues, outputValues: OutputValues) {
+		if (!this.db) throw new Error("db not initialized");
 		console.log("⏰ saving", [inputValues, outputValues]);
 
 		try {

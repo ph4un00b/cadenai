@@ -6,9 +6,14 @@
  * tl;dr - this is where all the tRPC server stuff is created and plugged in.
  * The pieces you will need to use are documented accordingly near the end
  */
-import { TRPCError, initTRPC } from "@trpc/server";
+
+import { EventEmitter } from "node:events";
+import { type IncomingMessage } from "node:http";
+import { TRPCError, initTRPC, type inferAsyncReturnType } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
+import { type NodeHTTPCreateContextFnOptions } from "@trpc/server/adapters/node-http";
 import superjson from "superjson";
+import type ws from "ws";
 import { ZodError } from "zod";
 
 import { getServerSession, type Session } from "@acme/auth";
@@ -25,6 +30,8 @@ import { prisma } from "@acme/db";
  */
 type CreateContextOptions = {
 	session: Session | null;
+	req: IncomingMessage | null;
+	res: ws | null;
 };
 
 /**
@@ -36,10 +43,15 @@ type CreateContextOptions = {
  * - trpc's `createSSGHelpers` where we don't have req/res
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  */
+
+const ee = new EventEmitter();
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
 	return {
 		session: opts.session,
+		req: opts.req,
+		res: opts.res,
 		prisma,
+		ee,
 	};
 };
 
@@ -48,13 +60,42 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  * process every request that goes through your tRPC endpoint
  * @link https://trpc.io/docs/context
  */
-export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-	const { req, res } = opts;
 
-	// Get the session from the server using the unstable_getServerSession wrapper function
-	const session = await getServerSession({ req, res });
+function isAPIRequest(
+	maybe: unknown,
+): maybe is CreateNextContextOptions["req"] {
+	return (maybe as EventEmitter).emit === undefined;
+}
+function isAPIResponse(
+	maybe: unknown,
+): maybe is CreateNextContextOptions["res"] {
+	return (maybe as EventEmitter).emit === undefined;
+}
 
-	return createInnerTRPCContext({ session });
+export const createTRPCContext = async (
+	opts:
+		| CreateNextContextOptions
+		| NodeHTTPCreateContextFnOptions<IncomingMessage, ws>,
+) => {
+	let req: CreateNextContextOptions["req"];
+	let res: CreateNextContextOptions["res"];
+	if (isAPIResponse(opts.res) && isAPIRequest(opts.req)) {
+		res = opts.res;
+		req = opts.req;
+		// Get the session from the server using the unstable_getServerSession wrapper function
+		const session = await getServerSession({ req, res });
+		return createInnerTRPCContext({ session, req: null, res: null });
+	}
+
+	if (!isAPIResponse(opts.res) && !isAPIRequest(opts.req)) {
+		return createInnerTRPCContext({
+			session: null,
+			req: opts.req,
+			res: opts.res,
+		});
+	}
+
+	return createInnerTRPCContext({ session: null, req: null, res: null });
 };
 
 /**
@@ -63,7 +104,9 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  * This is where the trpc api is initialized, connecting the context and
  * transformer
  */
-const t = initTRPC.context<typeof createTRPCContext>().create({
+type Context = inferAsyncReturnType<typeof createTRPCContext>;
+
+const t = initTRPC.context<Context>().create({
 	transformer: superjson,
 	errorFormatter({ shape, error }) {
 		const data = {

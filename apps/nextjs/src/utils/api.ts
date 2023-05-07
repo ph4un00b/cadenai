@@ -7,6 +7,7 @@ import {
 } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import superjson from "superjson";
+import ws from "ws";
 
 import type { AppRouter } from "@acme/api";
 
@@ -41,8 +42,11 @@ export const api = createTRPCNext<AppRouter>({
  * testing out nextjs limits!
  *
  * you should deploy on stateful environment.
+ *
+ * @link https://github.com/trpc/trpc/issues/3539
  */
 const wsClient = createWSClient({
+	WebSocket: ws as unknown as typeof WebSocket,
 	url: getBaseWebSocketUrl(),
 });
 

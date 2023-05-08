@@ -3,6 +3,7 @@ import {
 	createWSClient,
 	httpBatchLink,
 	loggerLink,
+	splitLink,
 	wsLink,
 } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
@@ -56,11 +57,21 @@ const links = [
 			process.env.NODE_ENV === "development" ||
 			(opts.direction === "down" && opts.result instanceof Error),
 	}),
-	httpBatchLink({
-		url: `${getBaseUrl()}/api/trpc`,
-	}),
-	wsLink({
-		client: wsClient,
+	/**
+	 * @see https://trpc.io/docs/links/splitLink#1-configure-client--utilstrpcts
+	 */
+	splitLink({
+		condition(op) {
+			return op.type === "subscription";
+		},
+		// when condition is true, use ws request
+		true: wsLink({
+			client: wsClient,
+		}),
+		// when condition is false, use batching
+		false: httpBatchLink({
+			url: `${getBaseUrl()}/api/trpc`,
+		}),
 	}),
 ];
 

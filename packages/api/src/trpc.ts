@@ -16,7 +16,8 @@ import superjson from "superjson";
 import type ws from "ws";
 import { ZodError } from "zod";
 
-import { getServerSession, type Session } from "@acme/auth";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { getReactSession, getServerSession, type Session } from "@acme/auth";
 import { prisma } from "@acme/db";
 
 import { type Message } from "./router/room";
@@ -50,7 +51,7 @@ type CreateContextOptions = {
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  */
 
-type RoomEvents = {
+type _RoomEvents = {
 	"event-1": Message;
 };
 
@@ -90,16 +91,19 @@ export const createTRPCContext = async (
 		| NodeHTTPCreateContextFnOptions<IncomingMessage, ws>,
 ) => {
 	let req: CreateNextContextOptions["req"];
-	let res: CreateNextContextOptions["res"];
+	let _res: CreateNextContextOptions["res"];
 	if (isAPIResponse(opts.res) && isAPIRequest(opts.req)) {
-		res = opts.res;
+		console.log(">>>>>> SERVER");
+		// res = opts.res;
 		req = opts.req;
 		// Get the session from the server using the unstable_getServerSession wrapper function
-		const session = await getServerSession({ req, res });
+		// const session = await getServerSession({ req, res });
+		const session = await getReactSession({ req });
 		return createInnerTRPCContext({ session, req: null, res: null });
 	}
 
 	if (!isAPIResponse(opts.res) && !isAPIRequest(opts.req)) {
+		console.log("<<<<<<<< WS");
 		return createInnerTRPCContext({
 			session: null,
 			req: opts.req,

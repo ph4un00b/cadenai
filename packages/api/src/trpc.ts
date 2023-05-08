@@ -7,7 +7,7 @@
  * The pieces you will need to use are documented accordingly near the end
  */
 
-import { EventEmitter } from "node:events";
+import { type EventEmitter } from "node:events";
 import { type IncomingMessage } from "node:http";
 import { TRPCError, initTRPC, type inferAsyncReturnType } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
@@ -18,6 +18,11 @@ import { ZodError } from "zod";
 
 import { getServerSession, type Session } from "@acme/auth";
 import { prisma } from "@acme/db";
+
+import { type Message } from "./router/room";
+import { TypedEventEmitter } from "./utils/eventemitter.class";
+
+// import { createEventEmitter } from "./utils/eventemitter.classless";
 
 /**
  * 1. CONTEXT
@@ -44,7 +49,12 @@ type CreateContextOptions = {
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  */
 
-const ee = new EventEmitter();
+type RoomEvents = {
+	"event-1": Message;
+};
+
+const ee = new TypedEventEmitter<RoomEvents>();
+// const ee = createEventEmitter<{ bar: () => void }>();
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
 	return {
 		session: opts.session,

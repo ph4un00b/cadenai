@@ -1,10 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { customAlphabet } from "nanoid";
 import { signIn, signOut } from "next-auth/react";
 
 import { api } from "~/utils/api";
 
+const nanoid = customAlphabet("abcde0123456789", 4);
+
 function Home() {
+	const router = useRouter();
+
+	const createRoom = () => {
+		const id = nanoid();
+		void router.push(`/rooms/${id}`);
+	};
+
 	return (
 		<>
 			<Head>
@@ -18,13 +29,16 @@ function Home() {
 						<span className="text-pink-500">CadenAI 🤗!</span>
 					</h1>
 					<AuthShowcase />
+					<button onClick={createRoom}>crete room</button>
 
-					<Query />
+					{/* <Streaming /> */}
+					{/* <Chain /> */}
+					{/* <Query />
 					<Template />
-					<Chain />
+					
 					<Agent />
-					<Memory />
-					<Redis />
+					<Memory /> */}
+					{/* <Redis /> */}
 					{/* @todo: fix sql prompt! */}
 					{/* <MemoryMysql /> */}
 				</div>
@@ -32,6 +46,22 @@ function Home() {
 		</>
 	);
 }
+
+// function Streaming() {
+// 	const streaming = api.ai.streaming.useQuery();
+
+// 	return (
+// 		<>
+// 			<section>
+// 				{streaming.isLoading ? (
+// 					<p>thinking...</p>
+// 				) : (
+// 					<h2>AI streaming-call: {streaming.data?.payload}</h2>
+// 				)}
+// 			</section>
+// 		</>
+// 	);
+// }
 
 function _MemoryMysql() {
 	const mysql = api.ai.mysql.useQuery();
@@ -85,7 +115,7 @@ function Redis() {
 					<h2>AI redis-call: {redis.data?.payload}</h2>
 				)}
 			</section>
-			{recall ? <Redis2 /> : <p>waiting...</p>}
+			{/* {recall ? <Redis2 /> : <p>waiting...</p>} */}
 		</>
 	);
 }

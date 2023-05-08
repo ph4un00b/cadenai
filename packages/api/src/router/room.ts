@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { observable } from "@trpc/server/observable";
 import { type } from "arktype";
 import { z } from "zod";
@@ -76,7 +77,15 @@ export const roomRouter = createTRPCRouter({
 			return true;
 		}),
 	onMsg: publicProcedure
-		.input(messageSchema)
+		.input(
+			/**
+			 * @todo
+			 * look for derived schema on zod!
+			 */
+			z.object({
+				roomId: z.string(),
+			}),
+		)
 		// .output(z.object({ payload: z.string() }))
 		.subscription(({ ctx, input }) => {
 			return observable<Message>((emit) => {

@@ -6,8 +6,8 @@ import {
 	wsLink,
 } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
+import IsoWebSocket from "isomorphic-ws";
 import superjson from "superjson";
-import ws from "ws";
 
 import type { AppRouter } from "@acme/api";
 
@@ -21,7 +21,7 @@ const getBaseUrl = () => {
 const getBaseWebSocketUrl = () => {
 	if (process.env.NEXT_PUBLIC_WS_URL)
 		return `https://${process.env.NEXT_PUBLIC_WS_URL}`;
-	return `ws://localhost:3011`;
+	return `ws://localhost:3001`;
 };
 
 export const api = createTRPCNext<AppRouter>({
@@ -46,7 +46,7 @@ export const api = createTRPCNext<AppRouter>({
  * @link https://github.com/trpc/trpc/issues/3539
  */
 const wsClient = createWSClient({
-	WebSocket: ws as unknown as typeof WebSocket,
+	WebSocket: IsoWebSocket as unknown as typeof WebSocket,
 	url: getBaseWebSocketUrl(),
 });
 

@@ -7,6 +7,7 @@
   "eslint.rules.customizations": [{ "rule": "*", "severity": "warn" }],
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": [
+    "arktype",
     "datetime",
     "fau's",
     "faunicolas",
@@ -23,6 +24,7 @@
     "phaudecrypter",
     "phauencrypter",
     "planetscale",
+    "suscrito",
     "TRPC",
     "upstash"
   ],

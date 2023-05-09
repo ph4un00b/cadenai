@@ -13,7 +13,7 @@ const getBaseUrl = () => {
 	return `http://localhost:3000`; // dev SSR should use localhost
 };
 
-const getBaseWebSocketUrl = () => {
+const _getBaseWebSocketUrl = () => {
 	if (process.env.NEXT_PUBLIC_WS_URL)
 		return `https://${process.env.NEXT_PUBLIC_WS_URL}`;
 	return `ws://localhost:3001`;

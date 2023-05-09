@@ -29,17 +29,22 @@ function Home() {
 						<span className="text-pink-500">CadenAI 🤗!</span>
 					</h1>
 					<AuthShowcase />
-					<button onClick={createRoom}>crete room</button>
+
+					<button
+						onClick={createRoom}
+						className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+					>
+						create room!
+					</button>
 
 					{/* <Streaming /> */}
-					{/* <Chain /> */}
-					{/* <Query />
+					<Chain />
+					<Query />
 					<Template />
-					
 					<Agent />
-					<Memory /> */}
-					{/* <Redis /> */}
-					{/* @todo: fix sql prompt! */}
+					<Memory />
+					<Redis />
+					{/* @todo: fix sql prompt! ❓ */}
 					{/* <MemoryMysql /> */}
 				</div>
 			</main>
@@ -115,7 +120,7 @@ function Redis() {
 					<h2>AI redis-call: {redis.data?.payload}</h2>
 				)}
 			</section>
-			{/* {recall ? <Redis2 /> : <p>waiting...</p>} */}
+			{recall ? <Redis2 /> : <p>waiting...</p>}
 		</>
 	);
 }

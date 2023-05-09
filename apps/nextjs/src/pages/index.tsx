@@ -38,12 +38,12 @@ function Home() {
 					</button>
 
 					{/* <Streaming /> */}
-					{/* <Chain /> */}
-					{/* <Query />
+					<Chain />
+					<Query />
 					<Template />
 					<Agent />
 					<Memory />
-					<Redis /> */}
+					<Redis />
 					{/* @todo: fix sql prompt! ❓ */}
 					{/* <MemoryMysql /> */}
 				</div>

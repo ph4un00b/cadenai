@@ -1,13 +1,7 @@
 import { type QueryClientConfig } from "@tanstack/react-query";
-import {
-	createWSClient,
-	httpBatchLink,
-	loggerLink,
-	splitLink,
-	wsLink,
-} from "@trpc/client";
+import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
-import IsoWebSocket from "isomorphic-ws";
+// import IsoWebSocket from "isomorphic-ws";
 import superjson from "superjson";
 
 import type { AppRouter } from "@acme/api";
@@ -46,10 +40,10 @@ export const api = createTRPCNext<AppRouter>({
  *
  * @link https://github.com/trpc/trpc/issues/3539
  */
-const wsClient = createWSClient({
-	WebSocket: IsoWebSocket as unknown as typeof WebSocket,
-	url: getBaseWebSocketUrl(),
-});
+// const wsClient = createWSClient({
+// 	WebSocket: IsoWebSocket as unknown as typeof WebSocket,
+// 	url: getBaseWebSocketUrl(),
+// });
 
 const links = [
 	loggerLink({
@@ -57,23 +51,26 @@ const links = [
 			process.env.NODE_ENV === "development" ||
 			(opts.direction === "down" && opts.result instanceof Error),
 	}),
+	httpBatchLink({
+		url: `${getBaseUrl()}/api/trpc`,
+	}),
 	/**
 	 * @see https://trpc.io/docs/links/splitLink#1-configure-client--utilstrpcts
 	 */
-	splitLink({
-		condition(op) {
-			console.log({ op });
-			return op.type === "subscription";
-		},
-		// when condition is true, use ws request
-		true: wsLink({
-			client: wsClient,
-		}),
-		// when condition is false, use batching
-		false: httpBatchLink({
-			url: `${getBaseUrl()}/api/trpc`,
-		}),
-	}),
+	// splitLink({
+	// 	condition(op) {
+	// 		console.log({ op });
+	// 		return op.type === "subscription";
+	// 	},
+	// 	// when condition is true, use ws request
+	// 	true: wsLink({
+	// 		client: wsClient,
+	// 	}),
+	// 	// when condition is false, use batching
+	// 	false: httpBatchLink({
+	// 		url: `${getBaseUrl()}/api/trpc`,
+	// 	}),
+	// }),
 ];
 
 export { type RouterInputs, type RouterOutputs } from "@acme/api";

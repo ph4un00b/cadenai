@@ -19,30 +19,6 @@ export default function RoomPage() {
 	const { query } = useRouter();
 	const roomId = query.roomId as string;
 
-	// console.log({ roomId });
-	api.room.onAdd.useSubscription(undefined, {
-		onData(newPost) {
-			console.log({ newPost });
-			// setMessages((all) => [...all, newPost]);
-		},
-		onError(err) {
-			console.error("Subscription error:", err);
-			// we might have missed a message - invalidate cache
-			// utils.room.infinite.invalidate();
-		},
-	});
-	api.room.onAdd2.useSubscription(undefined, {
-		onData(newPost) {
-			console.log({ newPost });
-			// setMessages((all) => [...all, newPost]);
-		},
-		onError(err) {
-			console.error("Subscription error:", err);
-			// we might have missed a message - invalidate cache
-			// utils.room.infinite.invalidate();
-		},
-	});
-
 	const { data: session } = useSession();
 
 	// const [message, setMessage] = useState("");

@@ -10,6 +10,8 @@ const wss = new ws.Server({
 const handler = applyWSSHandler({
 	wss,
 	router: appRouter,
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	/** @ts-ignore */
 	createContext: createTRPCContext,
 });
 

@@ -5,7 +5,6 @@
 	"scripts": {
 		"build": "pnpm with-env next build",
 		"clean": "git clean -xdf .next .turbo node_modules",
-		"dev:ws": "ts-node-dev --project tsconfig.wserver.json --respawn --transpile-only src/server/wsServer.ts",
 		"dev:next": "pnpm with-env next dev",
 		"dev": "run-p dev:*",
 		"lint": "dotenv -v SKIP_ENV_VALIDATION=1 next lint",

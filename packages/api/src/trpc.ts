@@ -20,8 +20,6 @@ import { ZodError } from "zod";
 import { getReactSession, getServerSession, type Session } from "@acme/auth";
 import { prisma } from "@acme/db";
 
-import { ee } from "./utils/eventemitter.class";
-
 // import { createEventEmitter } from "./utils/eventemitter.classless";
 
 /**
@@ -33,11 +31,7 @@ import { ee } from "./utils/eventemitter.class";
  * processing a request
  *
  */
-type CreateContextOptions = {
-	session: Session | null;
-	req: IncomingMessage | null;
-	res: ws | null;
-};
+type CreateContextOptions = { session: Session | null };
 
 /**
  * This helper generates the "internals" for a tRPC context. If you need to use
@@ -53,13 +47,7 @@ type CreateContextOptions = {
 // const ee = createEventEmitter<{ bar: () => void }>();
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
 	console.log({ session: opts.session });
-	return {
-		session: opts.session,
-		req: opts.req,
-		res: opts.res,
-		prisma,
-		ee,
-	};
+	return { session: opts.session, prisma };
 };
 
 /**
@@ -68,47 +56,22 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  * @link https://trpc.io/docs/context
  */
 
-function isAPIRequest(
-	maybe: unknown,
-): maybe is CreateNextContextOptions["req"] {
-	return (maybe as EventEmitter).emit === undefined;
-}
-function isAPIResponse(
-	maybe: unknown,
-): maybe is CreateNextContextOptions["res"] {
-	return (maybe as EventEmitter).emit === undefined;
-}
+// function isAPIRequest(
+// 	maybe: unknown,
+// ): maybe is CreateNextContextOptions["req"] {
+// 	return (maybe as EventEmitter).emit === undefined;
+// }
+// function isAPIResponse(
+// 	maybe: unknown,
+// ): maybe is CreateNextContextOptions["res"] {
+// 	return (maybe as EventEmitter).emit === undefined;
+// }
 
-export const createTRPCContext = async (
-	opts:
-		| CreateNextContextOptions
-		| NodeHTTPCreateContextFnOptions<IncomingMessage, ws>,
-) => {
-	let req: CreateNextContextOptions["req"];
-	let _res: CreateNextContextOptions["res"];
-	console.log(opts);
-	if (isAPIResponse(opts.res) && isAPIRequest(opts.req)) {
-		console.log(">>>>>> SERVER");
-		// res = opts.res;
-		req = opts.req;
-		// Get the session from the server using the unstable_getServerSession wrapper function
-		// const session = await getServerSession({ req, res });
-		const session = await getReactSession({ req });
-		return createInnerTRPCContext({ session, req: null, res: null });
-	}
-
-	if (!isAPIResponse(opts.res) && !isAPIRequest(opts.req)) {
-		console.log("<<<<<<<< WS");
-		// console.log({ opts });
-
-		return createInnerTRPCContext({
-			session: null,
-			req: opts.req,
-			res: opts.res,
-		});
-	}
-
-	return createInnerTRPCContext({ session: null, req: null, res: null });
+export const createTRPCContext = async (opts: CreateNextContextOptions) => {
+	// Get the session from the server using the unstable_getServerSession wrapper function
+	const session = await getServerSession(opts);
+	// const session = await getReactSession({ req });
+	return createInnerTRPCContext({ session });
 };
 
 /**

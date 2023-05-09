@@ -7,13 +7,9 @@
  * The pieces you will need to use are documented accordingly near the end
  */
 
-import { type EventEmitter } from "node:events";
-import { type IncomingMessage } from "node:http";
 import { TRPCError, initTRPC, type inferAsyncReturnType } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { type NodeHTTPCreateContextFnOptions } from "@trpc/server/adapters/node-http";
 import superjson from "superjson";
-import type ws from "ws";
 import { ZodError } from "zod";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

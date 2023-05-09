@@ -62,6 +62,7 @@ const links = [
 	 */
 	splitLink({
 		condition(op) {
+			console.log({ op });
 			return op.type === "subscription";
 		},
 		// when condition is true, use ws request

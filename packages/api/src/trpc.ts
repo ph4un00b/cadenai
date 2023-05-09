@@ -7,7 +7,7 @@
  * The pieces you will need to use are documented accordingly near the end
  */
 
-import { EventEmitter } from "node:events";
+import { type EventEmitter } from "node:events";
 import { type IncomingMessage } from "node:http";
 import { TRPCError, initTRPC, type inferAsyncReturnType } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
@@ -20,9 +20,7 @@ import { ZodError } from "zod";
 import { getReactSession, getServerSession, type Session } from "@acme/auth";
 import { prisma } from "@acme/db";
 
-import { type Message } from "./router/room";
-
-// import { TypedEventEmitter } from "./utils/eventemitter.class";
+import { ee } from "./utils/eventemitter.class";
 
 // import { createEventEmitter } from "./utils/eventemitter.classless";
 
@@ -51,14 +49,10 @@ type CreateContextOptions = {
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  */
 
-type _RoomEvents = {
-	"event-1": Message;
-};
-
-const ee = new EventEmitter();
-// const ee = new TypedEventEmitter<RoomEvents>();
+// const ee = new EventEmitter();
 // const ee = createEventEmitter<{ bar: () => void }>();
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
+	console.log({ session: opts.session });
 	return {
 		session: opts.session,
 		req: opts.req,
@@ -92,6 +86,7 @@ export const createTRPCContext = async (
 ) => {
 	let req: CreateNextContextOptions["req"];
 	let _res: CreateNextContextOptions["res"];
+	console.log(opts);
 	if (isAPIResponse(opts.res) && isAPIRequest(opts.req)) {
 		console.log(">>>>>> SERVER");
 		// res = opts.res;
@@ -104,6 +99,8 @@ export const createTRPCContext = async (
 
 	if (!isAPIResponse(opts.res) && !isAPIRequest(opts.req)) {
 		console.log("<<<<<<<< WS");
+		// console.log({ opts });
+
 		return createInnerTRPCContext({
 			session: null,
 			req: opts.req,

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { type QueryClientConfig } from "@tanstack/react-query";
-import { httpBatchLink, loggerLink } from "@trpc/client";
+import { httpBatchLink, httpLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 // import IsoWebSocket from "isomorphic-ws";
 import superjson from "superjson";
@@ -51,7 +52,7 @@ const links = [
 			process.env.NODE_ENV === "development" ||
 			(opts.direction === "down" && opts.result instanceof Error),
 	}),
-	httpBatchLink({
+	httpLink({
 		url: `${getBaseUrl()}/api/trpc`,
 	}),
 	/**

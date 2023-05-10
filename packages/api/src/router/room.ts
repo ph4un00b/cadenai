@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import crypto from "crypto";
 import { type } from "arktype";
 import { z } from "zod";

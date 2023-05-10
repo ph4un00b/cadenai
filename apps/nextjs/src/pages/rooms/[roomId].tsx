@@ -8,11 +8,14 @@ import { type Message } from "@acme/api/src/router/room";
 
 import { api } from "~/utils/api";
 
-const pusher = new Pusher("e308934c387a668f59c0", {
-	cluster: "us2",
-	forceTLS: true,
-});
-const channel = pusher.subscribe("cadenai-development");
+const globalForPusher = globalThis as { pusher?: Pusher };
+const pusher =
+	globalForPusher.pusher ||
+	new Pusher("e308934c387a668f59c0", {
+		cluster: "us2",
+		forceTLS: true,
+	});
+globalForPusher.pusher = pusher;
 
 function PostItem({ message }: { message: Message; session: Session | null }) {
 	return <li>{message.message}</li>;
@@ -22,23 +25,30 @@ export default function RoomPage() {
 	// const utils = api.useContext();
 	const sendMsgZod = api.room.sendMsgZod.useMutation();
 	// const sendMsg = api.room.sendMsg.useMutation();
-
 	const { query } = useRouter();
 	const roomId = query.roomId as string;
-
 	const { data: session } = useSession();
-
 	// const [message, setMessage] = useState("");
 	const [messages, setMessages] = useState<Message[]>([]);
 
 	useEffect(() => {
+		// console.log({ Pusher });
+		// if (Pusher.instances.length > 0) return;
+		pusher.connect();
+		const channel = pusher.subscribe("cadenai-development");
 		channel.bind("add-post", function (data: Message) {
 			console.log(JSON.stringify(data));
 			setMessages((p) => [...p, data]);
 		});
 
 		return () => {
+			/**
+			 * @todo
+			 * find out what's the correct hook to use here
+			 */
+			channel.unsubscribe();
 			channel.unbind_all();
+			pusher.disconnect();
 		};
 	}, []);
 	// if (!session) {

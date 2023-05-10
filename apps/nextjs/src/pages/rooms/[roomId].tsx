@@ -1,20 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { type Session } from "next-auth";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import Pusher from "pusher-js";
 
 import { type Message } from "@acme/api/src/router/room";
 
 import { api } from "~/utils/api";
 
-function PostItem({ message }: { message: Message; session: Session }) {
+const pusher = new Pusher("e308934c387a668f59c0", {
+	cluster: "us2",
+	forceTLS: true,
+});
+const channel = pusher.subscribe("cadenai-development");
+
+function PostItem({ message }: { message: Message; session: Session | null }) {
 	return <li>{message.message}</li>;
 }
 
 export default function RoomPage() {
 	// const utils = api.useContext();
 	const sendMsgZod = api.room.sendMsgZod.useMutation();
-	const sendMsg = api.room.sendMsg.useMutation();
+	// const sendMsg = api.room.sendMsg.useMutation();
 
 	const { query } = useRouter();
 	const roomId = query.roomId as string;
@@ -22,10 +29,21 @@ export default function RoomPage() {
 	const { data: session } = useSession();
 
 	// const [message, setMessage] = useState("");
-	const [messages, _setMessages] = useState<Message[]>([]);
-	if (!session) {
-		return <button onClick={() => void signIn()}>login</button>;
-	}
+	const [messages, setMessages] = useState<Message[]>([]);
+
+	useEffect(() => {
+		channel.bind("add-post", function (data: Message) {
+			console.log(JSON.stringify(data));
+			setMessages((p) => [...p, data]);
+		});
+
+		return () => {
+			channel.unbind_all();
+		};
+	}, []);
+	// if (!session) {
+	// 	return <button onClick={() => void signIn()}>login</button>;
+	// }
 
 	// const addMessages = useCallback((incoming?: Message[]) => {
 	// 	setMessages((current) => {
@@ -41,22 +59,6 @@ export default function RoomPage() {
 	// 		);
 	// 	});
 	// }, []);
-
-	async function postMessage(msg: string) {
-		try {
-			await sendMsgZod.mutateAsync({
-				message: msg,
-				roomId,
-			});
-			await sendMsg.mutateAsync({
-				message: msg,
-				roomId,
-			});
-			// setMessage("");
-		} catch (err) {
-			console.error(err);
-		}
-	}
 
 	return (
 		<main className="flex h-screen flex-col items-center bg-gradient-to-b from-[#230053] to-[#101225] text-slate-50">
@@ -74,7 +76,11 @@ export default function RoomPage() {
 				<form
 					onSubmit={(e) => {
 						e.preventDefault();
-						void postMessage("jamon");
+						// void postMessage("jamon");
+						sendMsgZod.mutate({
+							message: "hola",
+							roomId,
+						});
 					}}
 				>
 					<textarea

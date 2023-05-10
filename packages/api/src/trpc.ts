@@ -9,12 +9,28 @@
 
 import { TRPCError, initTRPC, type inferAsyncReturnType } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
+import Pusher from "pusher";
 import superjson from "superjson";
-import { ZodError } from "zod";
+import { ZodError, z } from "zod";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { getReactSession, getServerSession, type Session } from "@acme/auth";
 import { prisma } from "@acme/db";
+
+const schema = z.object({
+	PUSHER_ID: z.string(),
+	PUSHER_SECRET: z.string(),
+});
+
+const parsed = schema.safeParse(process.env);
+
+if (!parsed.success) {
+	const { fieldErrors } = parsed.error.flatten();
+	console.error("❌ Invalid environment variables in api/trpc", fieldErrors);
+	throw new Error("Invalid environment variables in api/trpc");
+}
+
+const env = Object.freeze(parsed.data);
 
 // import { createEventEmitter } from "./utils/eventemitter.classless";
 
@@ -41,9 +57,17 @@ type CreateContextOptions = { session: Session | null };
 
 // const ee = new EventEmitter();
 // const ee = createEventEmitter<{ bar: () => void }>();
+const pusher = new Pusher({
+	appId: env.PUSHER_ID,
+	key: "e308934c387a668f59c0",
+	secret: env.PUSHER_SECRET,
+	cluster: "us2",
+	useTLS: true,
+});
+
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
 	console.log({ session: opts.session });
-	return { session: opts.session, prisma };
+	return { session: opts.session, prisma, pusher };
 };
 
 /**

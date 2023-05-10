@@ -46,7 +46,7 @@ export const roomRouter = createTRPCRouter({
 			}).assert,
 		)
 		// .output(z.object({ payload: z.string() }))
-		.mutation(({ input, ctx }) => {
+		.mutation(async ({ input, ctx }) => {
 			const msg: Message = {
 				id: crypto.randomUUID(),
 				...input,
@@ -55,6 +55,12 @@ export const roomRouter = createTRPCRouter({
 			};
 
 			// const y = ctx.ee.emit("add", msg);
+			const resp = await ctx.pusher.trigger(
+				"cadenai-development",
+				"add-post",
+				msg,
+			);
+			console.log({ resp });
 			return true;
 		}),
 	sendMsgZod: publicProcedure
@@ -65,7 +71,7 @@ export const roomRouter = createTRPCRouter({
 			}),
 		)
 		// .output(z.object({ payload: z.string() }))
-		.mutation(({ input, ctx }) => {
+		.mutation(async ({ input, ctx }) => {
 			const msg: Message = {
 				id: crypto.randomUUID(),
 				...input,
@@ -81,6 +87,12 @@ export const roomRouter = createTRPCRouter({
 			 * it has no listeners
 			 */
 			// const x = ee.emit("add", msg);
+			const resp = await ctx.pusher.trigger(
+				"cadenai-development",
+				"add-post",
+				msg,
+			);
+			console.log({ resp });
 			return true;
 		}),
 });

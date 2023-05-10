@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
@@ -31,44 +31,10 @@ export default function RoomPage() {
 	// const [message, setMessage] = useState("");
 	const [messages, setMessages] = useState<Message[]>([]);
 
-	useEffect(() => {
-		// console.log({ Pusher });
-		// if (Pusher.instances.length > 0) return;
-		pusher.connect();
-		const channel = pusher.subscribe("cadenai-development");
-		channel.bind("add-post", function (data: Message) {
-			console.log(JSON.stringify(data));
-			setMessages((p) => [...p, data]);
-		});
-
-		return () => {
-			/**
-			 * @todo
-			 * find out what's the correct hook to use here
-			 */
-			channel.unsubscribe();
-			channel.unbind_all();
-			pusher.disconnect();
-		};
-	}, []);
-	// if (!session) {
-	// 	return <button onClick={() => void signIn()}>login</button>;
-	// }
-
-	// const addMessages = useCallback((incoming?: Message[]) => {
-	// 	setMessages((current) => {
-	// 		const map: Record<Message["id"], Message> = {};
-	// 		for (const msg of current ?? []) {
-	// 			map[msg.id] = msg;
-	// 		}
-	// 		for (const msg of incoming ?? []) {
-	// 			map[msg.id] = msg;
-	// 		}
-	// 		return Object.values(map).sort(
-	// 			(a, b) => a.sendAt.getTime() - b.sendAt.getTime(),
-	// 		);
-	// 	});
-	// }, []);
+	useSubscription<Message>("add-post", (data) => {
+		console.log(JSON.stringify(data));
+		setMessages((p) => [...p, data]);
+	});
 
 	return (
 		<main className="flex h-screen flex-col items-center bg-gradient-to-b from-[#230053] to-[#101225] text-slate-50">
@@ -105,4 +71,40 @@ export default function RoomPage() {
 			</div>
 		</main>
 	);
+}
+
+function useSubscription<TMessage>(
+	eventName: string,
+	callback: (data: TMessage) => void,
+) {
+	const stableCallback = useRef(callback);
+	useEffect(() => {
+		stableCallback.current = callback;
+	}, [callback]);
+
+	const channel = useRef(pusher.subscribe("cadenai-development")).current;
+
+	useEffect(() => {
+		// console.log({ Pusher });
+		// if (Pusher.instances.length > 0) return;
+		const reference = (data: TMessage) => {
+			stableCallback.current(data);
+		};
+
+		pusher.connect();
+		channel.bind(eventName, reference);
+
+		return () => {
+			/**
+			 * @todo
+			 * find out what's the correct hook to use here
+			 */
+
+			channel.unbind(eventName, reference);
+			channel.unsubscribe();
+			channel.unbind_all();
+
+			pusher.disconnect();
+		};
+	}, [eventName, channel]);
 }

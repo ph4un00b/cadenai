@@ -5,6 +5,7 @@ import { customAlphabet } from "nanoid";
 import { signIn, signOut } from "next-auth/react";
 
 import { api } from "~/utils/api";
+import { useSubscription } from "~/utils/pusher.hook";
 
 const nanoid = customAlphabet("abcde0123456789", 4);
 
@@ -37,13 +38,13 @@ function Home() {
 						create room!
 					</button>
 
-					{/* <Streaming /> */}
 					<Chain />
 					<Query />
 					<Template />
 					<Agent />
 					<Memory />
 					<Redis />
+					<Streaming />
 					{/* @todo: fix sql prompt! ❓ */}
 					{/* <MemoryMysql /> */}
 				</div>
@@ -52,21 +53,34 @@ function Home() {
 	);
 }
 
-// function Streaming() {
-// 	const streaming = api.ai.streaming.useQuery();
-
-// 	return (
-// 		<>
-// 			<section>
-// 				{streaming.isLoading ? (
-// 					<p>thinking...</p>
-// 				) : (
-// 					<h2>AI streaming-call: {streaming.data?.payload}</h2>
-// 				)}
-// 			</section>
-// 		</>
-// 	);
-// }
+function Streaming() {
+	const [AiReply, setAiReply] = useState("");
+	const [AiChunk, setAiChunk] = useState("");
+	const streaming = api.ai.streaming.useQuery();
+	useSubscription<string>("ai-reply", (data) => {
+		setAiReply(data);
+	});
+	useSubscription<string>("ai-chunk", (chunk) => {
+		console.log(JSON.stringify(chunk));
+		setAiChunk((prevChunk) => prevChunk + chunk);
+	});
+	return (
+		<>
+			<section>
+				{streaming.isLoading ? (
+					<p>thinking...</p>
+				) : (
+					<>
+						<h2>AI streaming-call: {streaming.data?.payload}</h2>
+					</>
+				)}
+				<br />
+				<p>{AiChunk}</p>
+				<p>{AiReply}</p>
+			</section>
+		</>
+	);
+}
 
 function _MemoryMysql() {
 	const mysql = api.ai.mysql.useQuery();

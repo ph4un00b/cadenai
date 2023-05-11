@@ -1,24 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
-import Pusher from "pusher-js";
 
 import { type Message } from "@acme/api/src/router/room";
 
 import { api } from "~/utils/api";
-
-const globalForPusher = globalThis as { pusher?: Pusher };
-const pusher =
-	globalForPusher.pusher ||
-	new Pusher("e308934c387a668f59c0", {
-		cluster: "us2",
-		forceTLS: true,
-	});
-globalForPusher.pusher = pusher;
+import { useSubscription } from "~/utils/pusher.hook";
 
 function PostItem({ message }: { message: Message; session: Session | null }) {
-	return <li>{message.message}</li>;
+	return <li>{JSON.stringify(message)}</li>;
 }
 
 export default function RoomPage() {
@@ -52,7 +43,6 @@ export default function RoomPage() {
 				<form
 					onSubmit={(e) => {
 						e.preventDefault();
-						// void postMessage("jamon");
 						sendMsgZod.mutate({
 							message: "hola",
 							roomId,
@@ -71,40 +61,4 @@ export default function RoomPage() {
 			</div>
 		</main>
 	);
-}
-
-function useSubscription<TMessage>(
-	eventName: string,
-	callback: (data: TMessage) => void,
-) {
-	const stableCallback = useRef(callback);
-	useEffect(() => {
-		stableCallback.current = callback;
-	}, [callback]);
-
-	const channel = useRef(pusher.subscribe("cadenai-development")).current;
-
-	useEffect(() => {
-		// console.log({ Pusher });
-		// if (Pusher.instances.length > 0) return;
-		const reference = (data: TMessage) => {
-			stableCallback.current(data);
-		};
-
-		pusher.connect();
-		channel.bind(eventName, reference);
-
-		return () => {
-			/**
-			 * @todo
-			 * find out what's the correct hook to use here
-			 */
-
-			channel.unbind(eventName, reference);
-			channel.unsubscribe();
-			channel.unbind_all();
-
-			pusher.disconnect();
-		};
-	}, [eventName, channel]);
 }

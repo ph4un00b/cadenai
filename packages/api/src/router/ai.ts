@@ -314,6 +314,36 @@ export const aiRouter = createTRPCRouter({
 			const { response } = res2;
 			return { payload: response as string };
 		}),
+	streaming: publicProcedure
+		.output(z.object({ payload: z.string() }))
+		.query(async ({ ctx }) => {
+			const cache = new UpstashCache({
+				url: env.REDIS_ENDPOINT,
+				token: env.REDIS_TOKEN,
+			});
+
+			const handleLLMNewToken = async (token: string) => {
+				//   process.stdout.write(token);
+				await ctx.pusher.trigger("cadenai-development", "ai-chunk", token);
+			};
+
+			const llm = new OpenAI({
+				cache,
+				openAIApiKey: env.OPENAI_API_KEY,
+				temperature: 0,
+				maxRetries: 1,
+				// maxConcurrency
+				streaming: true,
+				callbacks: [{ handleLLMNewToken }],
+			});
+
+			// const request = "Escribe me una cancion sobre puercos asesinos.";
+			const request = "Escribeme una cancion sobre la inflación de argentina.";
+			const resp = await llm.call(request);
+			await ctx.pusher.trigger("cadenai-development", "ai-reply", resp);
+
+			return { payload: `streaming... ${request}` };
+		}),
 });
 
 async function llmCall() {

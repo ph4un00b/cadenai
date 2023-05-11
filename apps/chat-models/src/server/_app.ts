@@ -7,11 +7,12 @@ import { z } from "zod";
 
 import { publicProcedure, router } from "./trpc";
 
-const appRouter = router({
+export const appRouter = router({
 	alo: publicProcedure.input(z.string()).query(({ input }) => {
 		return "alo jamon! 🎈 " + input;
 	}),
 });
+
 // Export type router type signature,
 // NOT the router itself.
 export type AppRouter = typeof appRouter;

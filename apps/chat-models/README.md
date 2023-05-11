@@ -1,1 +1,2 @@
+- [x] app-router
 - [x] trpc [https://trpc.io/docs/nextjs/setup]

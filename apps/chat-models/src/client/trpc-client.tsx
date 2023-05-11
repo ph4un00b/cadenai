@@ -3,6 +3,8 @@
 /**
  * 3. create trpc hooks
  * @see https://github.com/trpc/trpc/issues/3297
+ *
+ * @see https://trpc.io/docs/reactjs/setup#2-create-trpc-hooks
  */
 import { useState } from "react";
 import { type AppRouter } from "@/server/_app";

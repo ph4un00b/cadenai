@@ -1,4 +1,8 @@
+import { trpc } from "@/client/trpc-client";
+
 export default function Home() {
+	const hello = trpc.alo.useQuery("phau!");
+
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-between p-24">
 			<div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
@@ -20,6 +24,7 @@ export default function Home() {
 					height={37}
 					priority
 				/> */}
+				{hello.isLoading ? <p>did not work</p> : <p>Hello, {hello.data}</p>}
 			</div>
 
 			<div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">

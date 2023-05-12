@@ -1,3 +1,5 @@
+"use client";
+
 import { trpc } from "@/client/trpc-client";
 
 export default function Home() {

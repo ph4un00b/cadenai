@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * 2. initialize our main router instance
  * @see https://trpc.io/docs/quickstart#2-add-a-query-procedure
@@ -8,13 +9,16 @@ import { ChatOpenAI } from "langchain/chat_models/openai";
 import { HumanChatMessage, SystemChatMessage } from "langchain/schema";
 import { z } from "zod";
 
+import { UpstashCache } from "@acme/shared";
+
 import { publicProcedure, router } from "./trpc";
 
 const aiOpts = {
-	cache: new UpstashCache({
-		url: env.REDIS_ENDPOINT,
-		token: env.REDIS_TOKEN,
-	}),
+	// cache: new UpstashCache({
+	// 	url: env.REDIS_ENDPOINT,
+	// 	token: env.REDIS_TOKEN,
+	// }),
+	cache: true,
 	openAIApiKey: env.OPENAI_API_KEY,
 	temperature: 0,
 	maxRetries: 1,

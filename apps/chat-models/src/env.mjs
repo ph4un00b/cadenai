@@ -22,7 +22,7 @@ export const env = createEnv({
 	 * 💡 You'll get typeerrors if these are not prefixed with NEXT_PUBLIC_.
 	 */
 	client: {
-		NEXT_PUBLIC_WS_URL: z.string().min(1),
+		// NEXT_PUBLIC_WS_URL: z.string().min(1),
 	},
 	/*
 	 * Due to how Next.js bundles environment variables on Edge and Client,
@@ -33,7 +33,7 @@ export const env = createEnv({
 	runtimeEnv: {
 		DATABASE_URL: process.env.DATABASE_URL,
 		OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-		NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL,
+		// NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL,
 		REDIS_ENDPOINT: process.env.REDIS_ENDPOINT,
 		REDIS_TOKEN: process.env.REDIS_TOKEN,
 		DATABASE_HOST: process.env.DATABASE_HOST,

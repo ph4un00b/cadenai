@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import "../styles/globals.css";
 import type { AppType } from "next/app";
 import type { Session } from "next-auth";
@@ -11,6 +12,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
 	return (
 		<SessionProvider session={session}>
+			{/** @ts-expect-error TODO: research more! */}
 			<Component {...pageProps} />
 		</SessionProvider>
 	);

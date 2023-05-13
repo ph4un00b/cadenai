@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 /**
@@ -13,7 +14,7 @@ import {
 	QueryClientProvider,
 	type QueryClientConfig,
 } from "@tanstack/react-query";
-import { httpBatchLink, loggerLink } from "@trpc/client";
+import { httpBatchLink, httpLink, loggerLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import superjson from "superjson";
 
@@ -72,6 +73,7 @@ export function ClientProvider(props: { children: React.ReactNode }) {
 			links: [
 				loggerLink({ enabled: () => true }),
 				httpBatchLink({ url: `${getBaseUrl()}/api/trpc` }),
+				// httpLink({ url: `${getBaseUrl()}/api/trpc` }),
 			],
 
 			//in initTRPC.create @ server/trpc should be the same!

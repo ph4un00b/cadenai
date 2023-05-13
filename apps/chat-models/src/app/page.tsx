@@ -17,7 +17,7 @@ export default function Home() {
 				</div>
 			</div>
 
-			<div className="before:bg-gradient-radial after:bg-gradient-conic relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
+			<div className="before:bg-gradient-radial after:bg-gradient-conic relative flex flex-col place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
 				{/* <Image
 					className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
 					src="/next.svg"
@@ -28,6 +28,8 @@ export default function Home() {
 				/> */}
 				{hello.isLoading ? <p>did not work</p> : <p>Hello, {hello.data}</p>}
 				<Chat />
+				<Chat2 />
+				<Chat3 />
 			</div>
 
 			<div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
@@ -37,14 +39,77 @@ export default function Home() {
 	);
 }
 
+function ActionButton({
+	text,
+	handler,
+	payload,
+}: {
+	text: string;
+	handler: () => void;
+	payload: string;
+}) {
+	return (
+		<p>
+			<button
+				onClick={handler}
+				className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+			>
+				{text}
+			</button>{" "}
+			{payload}
+		</p>
+	);
+}
 function Chat() {
-	const chain = api.chat.useQuery();
+	const chat = api.chat.useMutation();
 	return (
 		<section>
-			{chain.isLoading ? (
+			{chat.isLoading ? (
 				<p>thinking...</p>
 			) : (
-				<h2>AI chain-call: {chain.data?.payload}</h2>
+				<ActionButton
+					text="AI chat-call:"
+					handler={() => {
+						chat.mutate();
+					}}
+					payload={chat.data?.payload ?? ""}
+				/>
+			)}
+		</section>
+	);
+}
+function Chat2() {
+	const chat2 = api.chat2.useMutation();
+	return (
+		<section>
+			{chat2.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<ActionButton
+					text="AI chat2-call:"
+					handler={() => {
+						chat2.mutate();
+					}}
+					payload={chat2.data?.payload ?? ""}
+				/>
+			)}
+		</section>
+	);
+}
+function Chat3() {
+	const chat3 = api.chat3.useMutation();
+	return (
+		<section>
+			{chat3.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<ActionButton
+					text="AI chat3-call:"
+					handler={() => {
+						chat3.mutate();
+					}}
+					payload={chat3.data?.payload ?? ""}
+				/>
 			)}
 		</section>
 	);

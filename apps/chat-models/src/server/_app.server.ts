@@ -5,6 +5,7 @@
  */
 
 import { env } from "@/env.mjs";
+import { Client } from "@planetscale/database";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { HumanChatMessage, SystemChatMessage } from "langchain/schema";
 import { z } from "zod";
@@ -28,6 +29,21 @@ const aiOpts = {
 };
 
 const chat = new ChatOpenAI(aiOpts);
+
+const db = new Client({
+	fetch,
+	host: env.DATABASE_HOST,
+	username: env.DATABASE_USER,
+	password: env.DATABASE_PASS,
+});
+
+const timerSchema = z.object({
+	payload: z.object({
+		completed: z.boolean(),
+		timeLeft: z.string().nullish(),
+		raw: z.string(),
+	}),
+});
 export const appRouter = router({
 	alo: publicProcedure.input(z.string()).query(({ input }) => {
 		return "... from server! 🎈 " + input;
@@ -97,6 +113,98 @@ export const appRouter = router({
 			const responseC = await chat.generate(messages);
 			return { payload: JSON.stringify(responseC, null, 2) };
 		}),
+	statusTimer: publicProcedure.output(timerSchema).query(async ({}) => {
+		const threshold = 10;
+		const conn = db.connection();
+		const { rows } = await conn.execute(
+			`
+			SELECT
+				owner
+				, status
+				, startedAt
+				, (startedAt + INTERVAL ${threshold} MINUTE) as endingAt
+				, CURRENT_TIMESTAMP() AS serverTime
+				, TIMEDIFF((startedAt + INTERVAL ${threshold} MINUTE), CURRENT_TIMESTAMP()) AS timeDifference
+				, IF(CURRENT_TIMESTAMP() BETWEEN startedAt AND (startedAt + INTERVAL ${threshold} MINUTE)
+					, NULL
+					, 1
+				) AS isReady
+			FROM
+				QueueTest
+			WHERE
+				LOWER(payload) = "chat model"
+			LIMIT 1;
+			`,
+		);
+
+		const schema = z.object({
+			owner: z.number(),
+			status: z.string(),
+			startedAt: z.string(),
+			endingAt: z.string(),
+			serverTime: z.string(),
+			timeDifference: z.string(),
+			isReady: z.coerce.boolean(),
+		});
+
+		const [data] = rows;
+		const parsed = schema.parse(data);
+		return {
+			payload: {
+				completed: parsed.isReady,
+				timeLeft: parsed.isReady ? "00:00" : parsed.timeDifference,
+				raw: JSON.stringify(parsed, null, 2),
+			},
+		};
+	}),
+	newTimer: publicProcedure.output(timerSchema).mutation(async ({}) => {
+		const conn = db.connection();
+		const { rows, rowsAffected } = await conn.execute(
+			`
+			UPDATE QueueTest
+			SET
+
+				owner = 1111, -- hardcoded chat-model id owner
+				available = 1,
+				status = 'IN_PROGRESS',
+				startedAt = NOW()
+			WHERE
+				payload = "CHAT MODEL"
+			AND
+				available = 0
+			LIMIT 1;
+			`,
+		);
+		return {
+			payload: {
+				completed: rowsAffected === 0 ? false : true,
+				raw: JSON.stringify({ affected: rowsAffected }, null, 2),
+			},
+		};
+	}),
+	endTimer: publicProcedure.output(timerSchema).mutation(async ({}) => {
+		const conn = db.connection();
+		const { rows, rowsAffected } = await conn.execute(
+			`
+			UPDATE QueueTest
+			SET
+				available = 0,
+				status = 'COMPLETED',
+				finishedAt = NOW()
+			WHERE
+				payload = "CHAT MODEL"
+			AND
+				available = 1
+			LIMIT 1;
+			`,
+		);
+		return {
+			payload: {
+				completed: rowsAffected === 0 ? false : true,
+				raw: JSON.stringify({ affected: rowsAffected }, null, 2),
+			},
+		};
+	}),
 });
 
 // Export type router type signature,

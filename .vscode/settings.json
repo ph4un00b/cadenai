@@ -20,6 +20,7 @@
 		"llms",
 		"lpush",
 		"lrange",
+		"mundo",
 		"NEXTAUTH",
 		"nextjs",
 		"openai",
@@ -32,6 +33,7 @@
 		"suscrito",
 		"tailwindcss",
 		"tanstack",
+		"TIMEDIFF",
 		"TRPC",
 		"upstash"
 	],

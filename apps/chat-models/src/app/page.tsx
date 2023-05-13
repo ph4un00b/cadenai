@@ -1,9 +1,38 @@
 "use client";
 
+import { useState } from "react";
 import { api } from "@/client/trpc-client";
 
 export default function Home() {
+	const utils = api.useContext();
+	const [newTimerData, setNewTimerData] = useState("");
 	const hello = api.alo.useQuery("phau!");
+	const statusTimer = api.statusTimer.useQuery();
+
+	const endTimer = api.endTimer.useMutation({
+		onError(err) {
+			console.log(err);
+		},
+		async onSuccess(data) {
+			console.log({ data });
+			if (data.payload.completed) {
+				await utils.statusTimer.invalidate();
+			}
+		},
+	});
+
+	const newTimer = api.newTimer.useMutation({
+		onError(err) {
+			console.log(err);
+		},
+		async onSuccess(data) {
+			console.log({ data });
+			if (data.payload.completed) {
+				await utils.statusTimer.invalidate();
+			}
+			setNewTimerData(JSON.stringify(JSON.parse(data.payload.raw)));
+		},
+	});
 
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -26,7 +55,27 @@ export default function Home() {
 					height={37}
 					priority
 				/> */}
-				{hello.isLoading ? <p>did not work</p> : <p>Hello, {hello.data}</p>}
+				{hello.isLoading ? <p>🌌🌌 thinking...</p> : <p>Hello, {hello.data}</p>}
+
+				<ActionButton
+					text={"create-timer ⚡"}
+					handler={() => newTimer.mutate()}
+					payload={newTimerData}
+				/>
+				{statusTimer.isLoading ? (
+					<p>🌌🌌 thinking...</p>
+				) : (
+					<div>
+						<span className="flex flex-row text-2xl">
+							time remaining:&nbsp;&nbsp;
+							<pre className="text-emerald-400">
+								{statusTimer.data?.payload.timeLeft}
+							</pre>
+						</span>
+						{/* <pre>{statusTimer.data?.payload.raw}</pre> */}
+					</div>
+				)}
+				<ActionButton text="end-timer 🚫" handler={() => endTimer.mutate()} />
 				<Chat />
 				<Chat2 />
 				<Chat3 />
@@ -42,22 +91,22 @@ export default function Home() {
 function ActionButton({
 	text,
 	handler,
-	payload,
+	payload = "",
 }: {
 	text: string;
 	handler: () => void;
-	payload: string;
+	payload?: string;
 }) {
 	return (
-		<p>
+		<div>
 			<button
 				onClick={handler}
-				className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+				className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline hover:bg-white/20"
 			>
 				{text}
 			</button>{" "}
 			{payload}
-		</p>
+		</div>
 	);
 }
 function Chat() {

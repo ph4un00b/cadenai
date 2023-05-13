@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+// /* eslint-disable @typescript-eslint/ban-ts-comment */
 import "../styles/globals.css";
 import type { AppType } from "next/app";
 import type { Session } from "next-auth";

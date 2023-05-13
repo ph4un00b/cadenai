@@ -1,13 +1,21 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Next.js",
-      "type": "node-terminal",
-      "request": "launch",
-      "command": "pnpm dev",
-      "cwd": "${workspaceFolder}/apps/nextjs/",
-      "skipFiles": ["<node_internals>/**"]
-    }
-  ]
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Next.js",
+			"type": "node-terminal",
+			"request": "launch",
+			"command": "pnpm dev",
+			"cwd": "${workspaceFolder}/apps/nextjs/",
+			"skipFiles": ["<node_internals>/**"]
+		},
+		{
+			"name": "chats",
+			"type": "node-terminal",
+			"request": "launch",
+			"command": "pnpm dev",
+			"cwd": "${workspaceFolder}/apps/chat-models/",
+			"skipFiles": ["<node_internals>/**"]
+		}
+	]
 }

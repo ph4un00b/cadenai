@@ -9,7 +9,7 @@ import hash from "object-hash";
  *
  * A huge benefit of having a remote cache (like redis) is that you can
  * access the cache from different processes/machines. The allows you to
- * seperate concerns and scale horizontally.
+ * separate concerns and scale horizontally.
  *
  * TODO: Make cache key consistent across versions of langchain.
  */

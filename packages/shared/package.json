@@ -1,0 +1,24 @@
+{
+	"name": "@acme/shared",
+	"version": "0.1.0",
+	"description": "",
+	"main": "./index.ts",
+	"types": "./index.ts",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"dependencies": {
+		"object-hash": "^3.0.0",
+		"@upstash/redis": "^1.20.4",
+		"langchain": "^0.0.64"
+	},
+	"devDependencies": {
+		"@acme/eslint-config": "^0.1.0",
+		"@total-typescript/ts-reset": "^0.4.2",
+		"@types/object-hash": "^3.0.2",
+		"typescript": "^5.0.4"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC"
+}

@@ -10,6 +10,11 @@ export const env = createEnv({
 	server: {
 		DATABASE_URL: z.string().url(),
 		OPENAI_API_KEY: z.string().min(1),
+		REDIS_ENDPOINT: z.string().url(),
+		REDIS_TOKEN: z.string(),
+		DATABASE_HOST: z.string(),
+		DATABASE_USER: z.string(),
+		DATABASE_PASS: z.string(),
 	},
 	/*
 	 * Environment variables available on the client (and server).
@@ -29,5 +34,10 @@ export const env = createEnv({
 		DATABASE_URL: process.env.DATABASE_URL,
 		OPENAI_API_KEY: process.env.OPENAI_API_KEY,
 		NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL,
+		REDIS_ENDPOINT: process.env.REDIS_ENDPOINT,
+		REDIS_TOKEN: process.env.REDIS_TOKEN,
+		DATABASE_HOST: process.env.DATABASE_HOST,
+		DATABASE_USER: process.env.DATABASE_USER,
+		DATABASE_PASS: process.env.DATABASE_PASS,
 	},
 });

@@ -8,10 +8,11 @@ import { DynamicTool, Tool } from "langchain/tools";
 import { Calculator } from "langchain/tools/calculator";
 import { z } from "zod";
 
+import { UpstashCache } from "@acme/shared";
+
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { MySQLMemory } from "../utils/langchain.planetscale_memory";
 import { RedisMemory } from "../utils/langchain.redis_memory";
-import { UpstashCache } from "../utils/langchain.upstash_cache";
 
 const schema = z.object({
 	OPENAI_API_KEY: z.string(),

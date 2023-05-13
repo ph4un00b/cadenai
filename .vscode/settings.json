@@ -1,47 +1,50 @@
 {
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true,
-  "eslint.rules.customizations": [{ "rule": "*", "severity": "warn" }],
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "cSpell.words": [
-    "arktype",
-    "cadenai",
-    "datetime",
-    "Dont",
-    "fau's",
-    "faunicolas",
-    "futuro",
-    "hola",
-    "jamon",
-    "langchain",
-    "llms",
-    "lpush",
-    "lrange",
-    "NEXTAUTH",
-    "openai",
-    "phau",
-    "phaubonacci",
-    "phaudecrypter",
-    "phauencrypter",
-    "planetscale",
-    "superjson",
-    "suscrito",
-    "TRPC",
-    "upstash"
-  ],
-  "workbench.colorCustomizations": {
-    "activityBar.background": "#3d2805",
-    "titleBar.activeBackground": "#b55909",
-    "titleBar.activeForeground": "#FCFAFE"
-  },
-  "[prisma]": {
-    "editor.defaultFormatter": "Prisma.prisma"
-  },
-  "conventionalCommits.scopes": [
-    "nextjs",
-    "chat-models"
-  ]
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true
+	},
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.formatOnSave": true,
+	"eslint.rules.customizations": [{ "rule": "*", "severity": "warn" }],
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"cSpell.words": [
+		"arktype",
+		"cadenai",
+		"datetime",
+		"Dont",
+		"fau's",
+		"faunicolas",
+		"futuro",
+		"hola",
+		"jamon",
+		"langchain",
+		"llms",
+		"lpush",
+		"lrange",
+		"NEXTAUTH",
+		"nextjs",
+		"openai",
+		"phau",
+		"phaubonacci",
+		"phaudecrypter",
+		"phauencrypter",
+		"planetscale",
+		"superjson",
+		"suscrito",
+		"tailwindcss",
+		"tanstack",
+		"TRPC",
+		"upstash"
+	],
+	"workbench.colorCustomizations": {
+		"activityBar.background": "#3d2805",
+		"titleBar.activeBackground": "#b55909",
+		"titleBar.activeForeground": "#FCFAFE"
+	},
+	"[prisma]": {
+		"editor.defaultFormatter": "Prisma.prisma"
+	},
+	"conventionalCommits.scopes": ["nextjs", "chat-models"],
+	"[jsonc]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
 }

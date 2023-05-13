@@ -6,6 +6,7 @@
 
 import { env } from "@/env.mjs";
 import { Client } from "@planetscale/database";
+import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { HumanChatMessage, SystemChatMessage } from "langchain/schema";
 import { z } from "zod";
@@ -40,10 +41,11 @@ const db = new Client({
 const timerSchema = z.object({
 	payload: z.object({
 		completed: z.boolean(),
-		timeLeft: z.string().nullish(),
+		timeLeft: z.coerce.number().nullish(),
 		raw: z.string(),
 	}),
 });
+
 export const appRouter = router({
 	alo: publicProcedure.input(z.string()).query(({ input }) => {
 		return "... from server! 🎈 " + input;
@@ -114,27 +116,32 @@ export const appRouter = router({
 			return { payload: JSON.stringify(responseC, null, 2) };
 		}),
 	statusTimer: publicProcedure.output(timerSchema).query(async ({}) => {
-		const threshold = 10;
+		const threshold = 1;
 		const conn = db.connection();
 		const { rows } = await conn.execute(
 			`
-			SELECT
-				owner
-				, status
-				, startedAt
-				, (startedAt + INTERVAL ${threshold} MINUTE) as endingAt
-				, CURRENT_TIMESTAMP() AS serverTime
-				, TIMEDIFF((startedAt + INTERVAL ${threshold} MINUTE), CURRENT_TIMESTAMP()) AS timeDifference
-				, IF(CURRENT_TIMESTAMP() BETWEEN startedAt AND (startedAt + INTERVAL ${threshold} MINUTE)
-					, NULL
-					, 1
-				) AS isReady
-			FROM
-				QueueTest
-			WHERE
-				LOWER(payload) = "chat model"
-			LIMIT 1;
-			`,
+		SELECT
+			owner
+			, status
+			, startedAt
+			, (startedAt + INTERVAL ${threshold} MINUTE) as endingAt
+			, CURRENT_TIMESTAMP() AS serverTime
+			, TIME_TO_SEC(
+				TIMEDIFF(
+					(startedAt + INTERVAL ${threshold} MINUTE)
+					, CURRENT_TIMESTAMP()
+				)
+			) AS timeDifference
+			, IF(CURRENT_TIMESTAMP() BETWEEN startedAt AND (startedAt + INTERVAL ${threshold} MINUTE)
+				, NULL
+				, 1
+			) AS isReady
+		FROM
+			QueueTest
+		WHERE
+			LOWER(payload) = "chat model"
+		LIMIT 1;
+		`,
 		);
 
 		const schema = z.object({
@@ -143,7 +150,7 @@ export const appRouter = router({
 			startedAt: z.string(),
 			endingAt: z.string(),
 			serverTime: z.string(),
-			timeDifference: z.string(),
+			timeDifference: z.coerce.number(),
 			isReady: z.coerce.boolean(),
 		});
 
@@ -152,7 +159,7 @@ export const appRouter = router({
 		return {
 			payload: {
 				completed: parsed.isReady,
-				timeLeft: parsed.isReady ? "00:00" : parsed.timeDifference,
+				timeLeft: parsed.isReady ? 0 : parsed.timeDifference,
 				raw: JSON.stringify(parsed, null, 2),
 			},
 		};
@@ -210,3 +217,19 @@ export const appRouter = router({
 // Export type router type signature,
 // NOT the router itself.
 export type AppRouter = typeof appRouter;
+
+/**
+ * Inference helpers for input types
+ * @example type HelloInput = RouterInputs['example']['hello']
+ **/
+export type RouterInputs = inferRouterInputs<AppRouter>;
+
+/**
+ * Inference helpers for output types
+ * @example type HelloOutput = RouterOutputs['example']['hello']
+ **/
+export type RouterOutputs = inferRouterOutputs<AppRouter>;
+
+// type MyRouterType = ReturnType<typeof createRouter>
+// export MyRouterLike = RouterLike<MyRouterType>
+// export MyRouterUtilsLike = UtilsLike<MyRouterType>

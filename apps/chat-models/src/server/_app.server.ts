@@ -29,16 +29,18 @@ export const appRouter = router({
 	alo: publicProcedure.input(z.string()).query(({ input }) => {
 		return "... from server! 🎈 " + input;
 	}),
-	chat: publicProcedure.input(z.string()).query(async ({}) => {
-		const chat = new ChatOpenAI(aiOpts);
-		const messages = [
-			new HumanChatMessage(
-				"Translate this sentence from English to French. I love programming.",
-			),
-		];
-		const response = await chat.call(messages);
-		return { payload: response };
-	}),
+	chat: publicProcedure
+		.output(z.object({ payload: z.string() }))
+		.query(async ({}) => {
+			const chat = new ChatOpenAI(aiOpts);
+			const messages = [
+				new HumanChatMessage(
+					"Translate this sentence from English to French. I love programming.",
+				),
+			];
+			const response = await chat.call(messages);
+			return { payload: JSON.stringify(response) };
+		}),
 });
 
 // Export type router type signature,

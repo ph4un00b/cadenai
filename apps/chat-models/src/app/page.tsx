@@ -1,9 +1,9 @@
 "use client";
 
-import { trpc } from "@/client/trpc-client";
+import { api } from "@/client/trpc-client";
 
 export default function Home() {
-	const hello = trpc.alo.useQuery("phau!");
+	const hello = api.alo.useQuery("phau!");
 
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -27,11 +27,25 @@ export default function Home() {
 					priority
 				/> */}
 				{hello.isLoading ? <p>did not work</p> : <p>Hello, {hello.data}</p>}
+				<Chat />
 			</div>
 
 			<div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
 				hola mundo 😉!
 			</div>
 		</main>
+	);
+}
+
+function Chat() {
+	const chain = api.chat.useQuery();
+	return (
+		<section>
+			{chain.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<h2>AI chain-call: {chain.data?.payload}</h2>
+			)}
+		</section>
 	);
 }

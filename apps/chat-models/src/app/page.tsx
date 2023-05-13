@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "@/client/trpc-client";
 
 export default function Home() {
 	const utils = api.useContext();
 	const [newTimerData, setNewTimerData] = useState("");
 	const hello = api.alo.useQuery("phau!");
-	const statusTimer = api.statusTimer.useQuery();
 
 	const endTimer = api.endTimer.useMutation({
 		onError(err) {
@@ -47,14 +46,6 @@ export default function Home() {
 			</div>
 
 			<div className="before:bg-gradient-radial after:bg-gradient-conic relative flex flex-col place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
-				{/* <Image
-					className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-					src="/next.svg"
-					alt="Next.js Logo"
-					width={180}
-					height={37}
-					priority
-				/> */}
 				{hello.isLoading ? <p>🌌🌌 thinking...</p> : <p>Hello, {hello.data}</p>}
 
 				<ActionButton
@@ -62,20 +53,11 @@ export default function Home() {
 					handler={() => newTimer.mutate()}
 					payload={newTimerData}
 				/>
-				{statusTimer.isLoading ? (
-					<p>🌌🌌 thinking...</p>
-				) : (
-					<div>
-						<span className="flex flex-row text-2xl">
-							time remaining:&nbsp;&nbsp;
-							<pre className="text-emerald-400">
-								{statusTimer.data?.payload.timeLeft}
-							</pre>
-						</span>
-						{/* <pre>{statusTimer.data?.payload.raw}</pre> */}
-					</div>
-				)}
+
+				<Remaining />
+
 				<ActionButton text="end-timer 🚫" handler={() => endTimer.mutate()} />
+
 				<Chat />
 				<Chat2 />
 				<Chat3 />
@@ -88,6 +70,43 @@ export default function Home() {
 	);
 }
 
+function Remaining() {
+	const [remaining, setRemaining] = useState(0);
+	const [isRunning, setIsRunning] = useState(false);
+	const statusTimer = api.statusTimer.useQuery(undefined, {
+		onSuccess(data) {
+			const time = data.payload.timeLeft ?? 0;
+			if (time > 0) {
+				setRemaining(time);
+				setIsRunning(true);
+			}
+		},
+	});
+
+	useEffect(() => {
+		if (remaining <= 0) setIsRunning(false);
+	}, [remaining]);
+
+	useInterval(() => setRemaining((r) => r - 1), isRunning ? 1000 : null);
+
+	return (
+		<>
+			{statusTimer.isLoading ? (
+				<p>🌌🌌 thinking...</p>
+			) : (
+				<div>
+					<span className="flex flex-row text-2xl">
+						time remaining for next chat slot:&nbsp;&nbsp;
+						<pre className="text-emerald-400">
+							{formatTime({ seconds: remaining })}
+						</pre>
+					</span>
+					{/* <pre>{statusTimer.data?.payload.raw}</pre> */}
+				</div>
+			)}
+		</>
+	);
+}
 function ActionButton({
 	text,
 	handler,
@@ -110,56 +129,131 @@ function ActionButton({
 	);
 }
 function Chat() {
-	const chat = api.chat.useMutation();
+	const utils = api.useContext();
+
+	const chat = api.chat.useMutation({
+		async onSuccess() {
+			await utils.client.endTimer.mutate();
+			await utils.client.newTimer.mutate();
+		},
+	});
 	return (
 		<section>
 			{chat.isLoading ? (
 				<p>thinking...</p>
 			) : (
-				<ActionButton
-					text="AI chat-call:"
-					handler={() => {
-						chat.mutate();
-					}}
-					payload={chat.data?.payload ?? ""}
-				/>
+				<div>
+					<button
+						onClick={() => chat.mutate()}
+						className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline hover:bg-white/20"
+					>
+						AI chat-call:
+					</button>{" "}
+					{chat.data?.payload ?? ""}
+				</div>
 			)}
 		</section>
 	);
 }
 function Chat2() {
-	const chat2 = api.chat2.useMutation();
+	const utils = api.useContext();
+
+	const chat2 = api.chat2.useMutation({
+		async onSuccess() {
+			await utils.client.endTimer.mutate();
+			await utils.client.newTimer.mutate();
+		},
+	});
 	return (
 		<section>
 			{chat2.isLoading ? (
 				<p>thinking...</p>
 			) : (
-				<ActionButton
-					text="AI chat2-call:"
-					handler={() => {
-						chat2.mutate();
-					}}
-					payload={chat2.data?.payload ?? ""}
-				/>
+				<div>
+					<button
+						onClick={() => chat2.mutate()}
+						className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline hover:bg-white/20"
+					>
+						AI chat2-call:
+					</button>{" "}
+					{chat2.data?.payload ?? ""}
+				</div>
 			)}
 		</section>
 	);
 }
 function Chat3() {
-	const chat3 = api.chat3.useMutation();
+	const utils = api.useContext();
+
+	const chat3 = api.chat3.useMutation({
+		async onSuccess() {
+			await utils.client.endTimer.mutate();
+			await utils.client.newTimer.mutate();
+		},
+	});
 	return (
 		<section>
 			{chat3.isLoading ? (
 				<p>thinking...</p>
 			) : (
-				<ActionButton
-					text="AI chat3-call:"
-					handler={() => {
-						chat3.mutate();
-					}}
-					payload={chat3.data?.payload ?? ""}
-				/>
+				<div>
+					<button
+						onClick={() => chat3.mutate()}
+						className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline hover:bg-white/20"
+					>
+						AI chat3-call:
+					</button>{" "}
+					{chat3.data?.payload ?? ""}
+				</div>
 			)}
 		</section>
 	);
+}
+
+function formatTime({ seconds = 0 }: { seconds?: number | null }): string {
+	if (!seconds) return "00:00:00";
+	const hours = Math.floor(seconds / 3600);
+	const minutes = Math.floor((seconds % 3600) / 60);
+	const remainingSeconds = Math.floor(seconds % 60);
+
+	return `${hours.toString().padStart(2, "0")}:${minutes
+		.toString()
+		.padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+}
+
+/** @link https://overreacted.io/making-setinterval-declarative-with-react-hooks/ */
+export function useInterval(callback: () => void, delay: number | null) {
+	const savedCallback = useRef<() => void>(null!);
+
+	useEffect(() => {
+		savedCallback.current = callback;
+	});
+
+	useEffect(() => {
+		function tick() {
+			savedCallback.current();
+		}
+
+		if (delay !== null) {
+			const id = window.setInterval(tick, delay);
+			return () => window.clearInterval(id);
+		}
+	}, [delay]);
+}
+
+export function useTimeout(callback: () => void, delay: number) {
+	const savedCallback = useRef<() => void>(null!);
+
+	useEffect(() => {
+		savedCallback.current = callback;
+	});
+
+	useEffect(() => {
+		function tick() {
+			savedCallback.current();
+		}
+
+		const id = window.setTimeout(tick, delay);
+		return () => window.clearTimeout(id);
+	}, [delay]);
 }

@@ -7,6 +7,7 @@
 import { env } from "@/env.mjs";
 import { Client } from "@planetscale/database";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
+import { LLMChain } from "langchain/chains";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import {
 	ChatPromptTemplate,
@@ -19,7 +20,7 @@ import { z } from "zod";
 import { publicProcedure, router } from "./trpc";
 
 // import { UpstashCache } from "@acme/shared";
-const chat = new ChatOpenAI({
+const llm = new ChatOpenAI({
 	// cache: new UpstashCache({
 	// 	url: env.REDIS_ENDPOINT,
 	// 	token: env.REDIS_TOKEN,
@@ -79,7 +80,7 @@ export const appRouter = router({
 					"Translate this sentence from English to French. I love programming.",
 				),
 			];
-			const response = await chat.call(messages);
+			const response = await llm.call(messages);
 			return { payload: JSON.stringify(response, null, 2) };
 		}),
 	chat2: publicProcedure
@@ -92,7 +93,7 @@ export const appRouter = router({
 				),
 				new HumanChatMessage("Translate: I love programming."),
 			];
-			const responseB = await chat.call(messages);
+			const responseB = await llm.call(messages);
 			return { payload: JSON.stringify(responseB, null, 2) };
 		}),
 	chat3: publicProcedure
@@ -118,7 +119,7 @@ export const appRouter = router({
 				],
 			];
 			// got 429!
-			const responseC = await chat.generate(messages);
+			const responseC = await llm.generate(messages);
 			return { payload: JSON.stringify(responseC, null, 2) };
 		}),
 	chatTemplates: publicProcedure
@@ -138,8 +139,32 @@ export const appRouter = router({
 					text: "I love programming.",
 				}),
 			];
-			const responseA = await chat.generatePrompt(values);
+			const responseA = await llm.generatePrompt(values);
 			return { payload: JSON.stringify(responseA, null, 2) };
+		}),
+	/**
+	 * prefer chain over template
+	 *
+	 * using chains seems to be cheaper?
+	 * @todo research!
+	 */
+	chatChain: publicProcedure
+		.output(z.object({ payload: z.string() }))
+		.mutation(async ({}) => {
+			const messages = [
+				SystemMessagePromptTemplate.fromTemplate(
+					"You are a helpful assistant that translates {input_language} to {output_language}.",
+				),
+				HumanMessagePromptTemplate.fromTemplate("{text}"),
+			];
+			const prompt = ChatPromptTemplate.fromPromptMessages(messages);
+			const chain = new LLMChain({ prompt, llm });
+			const responseB = await chain.call({
+				input_language: "English",
+				output_language: "French",
+				text: "I love programming.",
+			});
+			return { payload: JSON.stringify(responseB, null, 2) };
 		}),
 	statusTimer: publicProcedure.output(timerSchema).query(async ({}) => {
 		const threshold = 1; // minute

@@ -62,6 +62,7 @@ export default function Home() {
 				<Chat2 />
 				<Chat3 />
 				<ChatTemplates />
+				<ChatChain cheap={true} />
 			</div>
 
 			<div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
@@ -151,6 +152,33 @@ function ChatTemplates() {
 						AI template-call:
 					</button>{" "}
 					{template.data?.payload ?? ""}
+				</div>
+			)}
+		</section>
+	);
+}
+function ChatChain({ cheap = false }: { cheap: boolean }) {
+	const utils = api.useContext();
+
+	const chain = api.chatChain.useMutation({
+		async onSuccess() {
+			await utils.client.endTimer.mutate();
+			await utils.client.newTimer.mutate();
+		},
+	});
+	return (
+		<section>
+			{chain.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<div>
+					<button
+						onClick={() => chain.mutate()}
+						className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline hover:bg-green-400/20"
+					>
+						AI chain-call:
+					</button>{" "}
+					{chain.data?.payload ?? ""}
 				</div>
 			)}
 		</section>

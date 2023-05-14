@@ -11,11 +11,10 @@ import { ChatOpenAI } from "langchain/chat_models/openai";
 import { HumanChatMessage, SystemChatMessage } from "langchain/schema";
 import { z } from "zod";
 
-import { UpstashCache } from "@acme/shared";
-
 import { publicProcedure, router } from "./trpc";
 
-const aiOpts = {
+// import { UpstashCache } from "@acme/shared";
+const chat = new ChatOpenAI({
 	// cache: new UpstashCache({
 	// 	url: env.REDIS_ENDPOINT,
 	// 	token: env.REDIS_TOKEN,
@@ -27,9 +26,7 @@ const aiOpts = {
 	verbose: true,
 	concurrency: 1,
 	maxConcurrency: 1,
-};
-
-const chat = new ChatOpenAI(aiOpts);
+});
 
 const db = new Client({
 	fetch,
@@ -46,6 +43,10 @@ const timerSchema = z.object({
 	}),
 });
 
+/**
+ * @todo
+ * add rate limiter
+ */
 export const appRouter = router({
 	alo: publicProcedure.input(z.string()).query(({ input }) => {
 		return "... from server! 🎈 " + input;
@@ -116,7 +117,7 @@ export const appRouter = router({
 			return { payload: JSON.stringify(responseC, null, 2) };
 		}),
 	statusTimer: publicProcedure.output(timerSchema).query(async ({}) => {
-		const threshold = 1;
+		const threshold = 1; // minute
 		const conn = db.connection();
 		const { rows } = await conn.execute(
 			`
@@ -156,61 +157,58 @@ export const appRouter = router({
 
 		const [data] = rows;
 		const parsed = schema.parse(data);
-		return {
-			payload: {
-				completed: parsed.isReady,
-				timeLeft: parsed.isReady ? 0 : parsed.timeDifference,
-				raw: JSON.stringify(parsed, null, 2),
-			},
+		const payload = {
+			completed: parsed.isReady,
+			timeLeft: parsed.isReady ? 0 : parsed.timeDifference,
+			raw: JSON.stringify(parsed, null, 2),
 		};
+		return { payload };
 	}),
 	newTimer: publicProcedure.output(timerSchema).mutation(async ({}) => {
 		const conn = db.connection();
 		const { rows, rowsAffected } = await conn.execute(
 			`
-			UPDATE QueueTest
-			SET
+		UPDATE QueueTest
+		SET
 
-				owner = 1111, -- hardcoded chat-model id owner
-				available = 1,
-				status = 'IN_PROGRESS',
-				startedAt = NOW()
-			WHERE
-				payload = "CHAT MODEL"
-			AND
-				available = 0
-			LIMIT 1;
-			`,
+			owner = 1111, -- hardcoded chat-model id owner
+			available = 1,
+			status = 'IN_PROGRESS',
+			startedAt = NOW()
+		WHERE
+			payload = "CHAT MODEL"
+		AND
+			available = 0
+		LIMIT 1;
+		`,
 		);
-		return {
-			payload: {
-				completed: rowsAffected === 0 ? false : true,
-				raw: JSON.stringify({ affected: rowsAffected }, null, 2),
-			},
+		const payload = {
+			completed: rowsAffected === 0 ? false : true,
+			raw: JSON.stringify({ affected: rowsAffected }, null, 2),
 		};
+		return { payload };
 	}),
 	endTimer: publicProcedure.output(timerSchema).mutation(async ({}) => {
 		const conn = db.connection();
 		const { rows, rowsAffected } = await conn.execute(
 			`
-			UPDATE QueueTest
-			SET
-				available = 0,
-				status = 'COMPLETED',
-				finishedAt = NOW()
-			WHERE
-				payload = "CHAT MODEL"
-			AND
-				available = 1
-			LIMIT 1;
-			`,
+		UPDATE QueueTest
+		SET
+			available = 0,
+			status = 'COMPLETED',
+			finishedAt = NOW()
+		WHERE
+			payload = "CHAT MODEL"
+		AND
+			available = 1
+		LIMIT 1;
+		`,
 		);
-		return {
-			payload: {
-				completed: rowsAffected === 0 ? false : true,
-				raw: JSON.stringify({ affected: rowsAffected }, null, 2),
-			},
+		const payload = {
+			completed: rowsAffected === 0 ? false : true,
+			raw: JSON.stringify({ affected: rowsAffected }, null, 2),
 		};
+		return { payload };
 	}),
 });
 

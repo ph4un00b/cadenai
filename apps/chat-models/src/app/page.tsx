@@ -61,6 +61,7 @@ export default function Home() {
 				<Chat />
 				<Chat2 />
 				<Chat3 />
+				<ChatTemplates />
 			</div>
 
 			<div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
@@ -126,6 +127,33 @@ function ActionButton({
 			</button>{" "}
 			{payload}
 		</div>
+	);
+}
+function ChatTemplates() {
+	const utils = api.useContext();
+
+	const template = api.chatTemplates.useMutation({
+		async onSuccess() {
+			await utils.client.endTimer.mutate();
+			await utils.client.newTimer.mutate();
+		},
+	});
+	return (
+		<section>
+			{template.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<div>
+					<button
+						onClick={() => template.mutate()}
+						className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline hover:bg-white/20"
+					>
+						AI template-call:
+					</button>{" "}
+					{template.data?.payload ?? ""}
+				</div>
+			)}
+		</section>
 	);
 }
 function Chat() {

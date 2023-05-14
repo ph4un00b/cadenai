@@ -8,6 +8,11 @@ import { env } from "@/env.mjs";
 import { Client } from "@planetscale/database";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import { ChatOpenAI } from "langchain/chat_models/openai";
+import {
+	ChatPromptTemplate,
+	HumanMessagePromptTemplate,
+	SystemMessagePromptTemplate,
+} from "langchain/prompts";
 import { HumanChatMessage, SystemChatMessage } from "langchain/schema";
 import { z } from "zod";
 
@@ -115,6 +120,26 @@ export const appRouter = router({
 			// got 429!
 			const responseC = await chat.generate(messages);
 			return { payload: JSON.stringify(responseC, null, 2) };
+		}),
+	chatTemplates: publicProcedure
+		.output(z.object({ payload: z.string() }))
+		.mutation(async ({}) => {
+			const messages = [
+				SystemMessagePromptTemplate.fromTemplate(
+					"You are a helpful assistant that translates {input_language} to {output_language}.",
+				),
+				HumanMessagePromptTemplate.fromTemplate("{text}"),
+			];
+			const prompt = ChatPromptTemplate.fromPromptMessages(messages);
+			const values = [
+				await prompt.formatPromptValue({
+					input_language: "English",
+					output_language: "French",
+					text: "I love programming.",
+				}),
+			];
+			const responseA = await chat.generatePrompt(values);
+			return { payload: JSON.stringify(responseA, null, 2) };
 		}),
 	statusTimer: publicProcedure.output(timerSchema).query(async ({}) => {
 		const threshold = 1; // minute

@@ -7,6 +7,7 @@
 import { env } from "@/env.mjs";
 import { Client } from "@planetscale/database";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
+import { AgentExecutor, ChatAgent } from "langchain/agents";
 import { LLMChain } from "langchain/chains";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import {
@@ -15,7 +16,11 @@ import {
 	SystemMessagePromptTemplate,
 } from "langchain/prompts";
 import { HumanChatMessage, SystemChatMessage } from "langchain/schema";
+import { DynamicTool, type Tool } from "langchain/tools";
+import { Calculator } from "langchain/tools/calculator";
 import { z } from "zod";
+
+import { phaubonacci, phaudecrypter, phauencrypter } from "@acme/shared";
 
 import { publicProcedure, router } from "./trpc";
 
@@ -165,6 +170,39 @@ export const appRouter = router({
 				text: "I love programming.",
 			});
 			return { payload: JSON.stringify(responseB, null, 2) };
+		}),
+	chatAgent: publicProcedure
+		.output(z.object({ payload: z.string() }))
+		.mutation(async ({}) => {
+			const tools: Tool[] = [
+				new Calculator(),
+				new DynamicTool({
+					name: "phaubonacci",
+					description:
+						"call this when you want to use the phaubonacci. input should be a single number.",
+					func: async (input) => Promise.resolve(phaubonacci(Number(input))),
+				}),
+				new DynamicTool({
+					name: "phauencrypter",
+					description:
+						"call this when you want to use phauencrypter. input should be a string of characters.",
+					func: async (input) => Promise.resolve(phauencrypter(input)),
+				}),
+				new DynamicTool({
+					name: "phaudecrypter",
+					description:
+						"call this when you want to use phaudecrypter. input should be a string of characters.",
+					func: async (input) => Promise.resolve(phaudecrypter(input)),
+				}),
+			];
+			// Create the agent from the chat model and the tools
+			const agent = ChatAgent.fromLLMAndTools(llm, tools);
+			// Create an executor, which calls to the agent until an answer is found
+			const executor = AgentExecutor.fromAgentAndTools({ agent, tools });
+			const responseG = await executor.run(
+				"you have 2 + 2 elevate it to te power of 2",
+			);
+			return { payload: responseG };
 		}),
 	statusTimer: publicProcedure.output(timerSchema).query(async ({}) => {
 		const threshold = 1; // minute

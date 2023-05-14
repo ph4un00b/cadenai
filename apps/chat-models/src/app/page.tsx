@@ -63,6 +63,7 @@ export default function Home() {
 				<Chat3 />
 				<ChatTemplates />
 				<ChatChain cheap={true} />
+				<ChatAgent />
 			</div>
 
 			<div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
@@ -162,6 +163,7 @@ function ChatChain({ cheap = false }: { cheap: boolean }) {
 
 	const chain = api.chatChain.useMutation({
 		async onSuccess() {
+			console.log({ cheap });
 			await utils.client.endTimer.mutate();
 			await utils.client.newTimer.mutate();
 		},
@@ -184,6 +186,38 @@ function ChatChain({ cheap = false }: { cheap: boolean }) {
 		</section>
 	);
 }
+
+function ChatAgent({ cheap = false }: { cheap?: boolean }) {
+	const utils = api.useContext();
+
+	const agent = api.chatAgent.useMutation({
+		onError(err) {
+			console.error(err);
+		},
+		async onSuccess() {
+			await utils.client.endTimer.mutate();
+			await utils.client.newTimer.mutate();
+		},
+	});
+	return (
+		<section>
+			{agent.isLoading ? (
+				<p>thinking...</p>
+			) : (
+				<div>
+					<button
+						onClick={() => agent.mutate()}
+						className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline hover:bg-white/20"
+					>
+						AI agent-call:
+					</button>{" "}
+					{agent.data?.payload ?? ""}
+				</div>
+			)}
+		</section>
+	);
+}
+
 function Chat() {
 	const utils = api.useContext();
 

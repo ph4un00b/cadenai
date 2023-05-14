@@ -129,11 +129,11 @@ export const aiRouter = createTRPCRouter({
 				verbose: true,
 			});
 
-			console.log("Loaded agent.");
+			// console.log("Loaded agent.");
 
 			const input =
 				"apply me the phaudecrypter for hola mundo! and append to the result the phaubonacci of 10";
-			console.log(`Executing with input "${input}"...`);
+			// console.log(`Executing with input "${input}"...`);
 
 			const { output } = await executor.call({ input });
 			// console.log({ output });

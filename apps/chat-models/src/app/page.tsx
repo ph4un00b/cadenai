@@ -187,7 +187,7 @@ function ChatChain({ cheap = false }: { cheap: boolean }) {
 	);
 }
 
-function ChatAgent({ cheap = false }: { cheap?: boolean }) {
+function ChatAgent() {
 	const utils = api.useContext();
 
 	const agent = api.chatAgent.useMutation({

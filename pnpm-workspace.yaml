@@ -2,6 +2,7 @@ packages:
   - apps/expo
   - apps/chat-models
   - apps/nextjs
+  - apps/embeddings-zact
   - packages/api
   - packages/auth
   - packages/db

@@ -15,11 +15,13 @@
 		"faunicolas",
 		"futuro",
 		"hola",
+		"ianvs",
 		"jamon",
 		"langchain",
 		"llms",
 		"lpush",
 		"lrange",
+		"manypkg",
 		"mundo",
 		"NEXTAUTH",
 		"nextjs",
@@ -29,13 +31,15 @@
 		"phaudecrypter",
 		"phauencrypter",
 		"planetscale",
+		"pscale",
 		"superjson",
 		"suscrito",
 		"tailwindcss",
 		"tanstack",
 		"TIMEDIFF",
 		"TRPC",
-		"upstash"
+		"upstash",
+		"zact"
 	],
 	"workbench.colorCustomizations": {
 		"activityBar.background": "#3d2805",
@@ -45,7 +49,7 @@
 	"[prisma]": {
 		"editor.defaultFormatter": "Prisma.prisma"
 	},
-	"conventionalCommits.scopes": ["nextjs", "chat-models"],
+	"conventionalCommits.scopes": ["nextjs", "chat-models", "embeddings"],
 	"[jsonc]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	}

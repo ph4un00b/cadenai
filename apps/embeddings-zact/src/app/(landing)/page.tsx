@@ -12,9 +12,9 @@ export default async function Home() {
 				<span className="text-pink-500">CadenAI 🤗!</span>
 			</h1>
 
-			<button className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20">
+			{/* <button className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20">
 				wait!
-			</button>
+			</button> */}
 		</div>
 	);
 }

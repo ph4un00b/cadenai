@@ -1,37 +1,23 @@
 // "use server";
 
 import { revalidatePath } from "next/cache";
-import { Redis } from "@upstash/redis";
 
 import { wait } from "@acme/shared";
 
-import { env } from "~/env.mjs";
+import { getTodos, nukeTodos, setTodo } from "~/services/todo";
 import { ClientButton } from "./disabled-btn";
 
-const redis = new Redis({
-	url: env.REDIS_ENDPOINT,
-	token: env.REDIS_TOKEN,
-});
-
-type Todos = {
-	todos: ReadonlyArray<string>;
-};
-
 export default async function Todos() {
-	const { todos } = ((await redis.json.get("todos")) as Todos) ?? { todos: [] };
-	if (todos.length == 0)
-		await redis.json.set("todos", "$", { todos: ["jamon-1"] });
-
+	const todos = await getTodos();
 	async function addTodo(todo: string) {
 		"use server";
-		await redis.json.arrappend("todos", "$.todos", JSON.stringify(todo));
+		await setTodo(todo);
 		await wait(1000); // this wil not show the loading.ts
 		revalidatePath("/todos/transition");
 	}
 	const deleteAll = async () => {
 		"use server";
-		console.log("deleting!! 😫");
-		await redis.del("todos");
+		await nukeTodos();
 		revalidatePath("/todos/transition");
 	};
 	return (

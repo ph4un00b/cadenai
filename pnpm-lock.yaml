@@ -109,6 +109,9 @@ importers:
 
   apps/embeddings-zact:
     dependencies:
+      '@acme/shared':
+        specifier: ^0.1.0
+        version: link:../../packages/shared
       '@t3-oss/env-nextjs':
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.0.4)(zod@3.21.4)

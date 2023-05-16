@@ -6,6 +6,13 @@
 
 /** @type {import("next").NextConfig} */
 const config = {
+	webpack(config) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+		config.experiments = { ...config.experiments, topLevelAwait: true };
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+		return config;
+	},
+	experimental: { serverActions: true },
 	reactStrictMode: true,
 	/** Enables hot reloading for local packages without a build step */
 	transpilePackages: ["@acme/shared"],

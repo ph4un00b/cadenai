@@ -8,6 +8,7 @@
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"cSpell.words": [
 		"arktype",
+		"arrappend",
 		"cadenai",
 		"datetime",
 		"Dont",
@@ -37,13 +38,14 @@
 		"tailwindcss",
 		"tanstack",
 		"TIMEDIFF",
+		"todos",
 		"TRPC",
 		"upstash",
 		"zact"
 	],
 	"workbench.colorCustomizations": {
 		"activityBar.background": "#3d2805",
-		"titleBar.activeBackground": "#b55909",
+		"titleBar.activeBackground": "#5e2b03",
 		"titleBar.activeForeground": "#FCFAFE"
 	},
 	"[prisma]": {

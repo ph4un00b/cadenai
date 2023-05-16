@@ -8,6 +8,13 @@ const config = {
 		"prettier",
 	],
 	rules: {
+		// this is for server-actions on forms
+		"@typescript-eslint/no-misused-promises": [
+			"error",
+			{
+				checksVoidReturn: false,
+			},
+		],
 		"@typescript-eslint/no-non-null-assertion": "off",
 		"@next/next/no-html-link-for-pages": "off",
 		"@typescript-eslint/restrict-template-expressions": "off",

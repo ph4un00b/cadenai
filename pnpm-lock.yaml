@@ -109,6 +109,9 @@ importers:
 
   apps/embeddings-zact:
     dependencies:
+      '@t3-oss/env-nextjs':
+        specifier: ^0.3.1
+        version: 0.3.1(typescript@5.0.4)(zod@3.21.4)
       '@types/node':
         specifier: 20.1.4
         version: 20.1.4
@@ -118,12 +121,18 @@ importers:
       '@types/react-dom':
         specifier: 18.2.4
         version: 18.2.4
+      '@upstash/redis':
+        specifier: ^1.20.4
+        version: 1.20.4
       autoprefixer:
         specifier: 10.4.14
         version: 10.4.14(postcss@8.4.23)
       next:
         specifier: 13.4.2
         version: 13.4.2(@babel/core@7.21.4)(react-dom@18.2.0)(react@18.2.0)
+      openai:
+        specifier: ^3.2.1
+        version: 3.2.1
       postcss:
         specifier: 8.4.23
         version: 8.4.23
@@ -139,6 +148,9 @@ importers:
       typescript:
         specifier: 5.0.4
         version: 5.0.4
+      zod:
+        specifier: ^3.21.4
+        version: 3.21.4
 
   apps/expo:
     dependencies:

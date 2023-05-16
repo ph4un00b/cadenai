@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { Redis } from "@upstash/redis";
 
 import { env } from "~/env.mjs";
+import { ClientButton } from "./disabled-btn";
 
 const redis = new Redis({
 	url: env.REDIS_ENDPOINT,
@@ -50,12 +51,7 @@ export default async function Todos() {
 			</ul>
 			<form action={addTodo}>
 				<input type="text" name="todo" />
-				<button
-					type="submit"
-					className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-				>
-					submit
-				</button>
+				<ClientButton text="submit" />
 			</form>
 			<form action={deleteAll}>
 				<button
@@ -65,6 +61,7 @@ export default async function Todos() {
 					delete all 😨
 				</button>
 			</form>
+			<ClientButton />
 		</div>
 	);
 }

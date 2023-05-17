@@ -8,7 +8,7 @@ import {
 	validatedActionAlt,
 	validatedAddTodo,
 	validatedNukeTodos,
-} from "~/app/actions";
+} from "~/app/(rpc)/actions";
 
 export function ValidateButton({ text }: { text?: string }) {
 	const [pending, startTransition] = useTransition();
@@ -74,6 +74,7 @@ export function AddTodoButton() {
 				disabled={pending}
 				onClick={() => {
 					const val = todo.current!.value;
+					console.log({ val });
 					if (!val) return;
 
 					startTransition(async () => {

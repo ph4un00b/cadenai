@@ -1,4 +1,4 @@
-import CallBtn from "./action.client";
+import CallBtn from "../(ui)/action.client";
 import call from "./fns/call.server";
 
 export default function Embeds() {

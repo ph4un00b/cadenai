@@ -7,10 +7,17 @@ import {
 	NukeTodosButton,
 	ValidateButton,
 	ValidateHookButton,
-} from "./actions.client";
+} from "./(ui)/actions.client";
 
-const todos = await getTodos();
-export default function Todos() {
+/**
+ * @todo This 'todos' is cached; conduct further research.
+ * export const revalidate = 60; does not seem to work here
+ */
+// const todos = await getTodos();
+
+export default async function Todos() {
+	const todos = await getTodos();
+	console.log("zact-todos!");
 	return (
 		<div>
 			<h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">

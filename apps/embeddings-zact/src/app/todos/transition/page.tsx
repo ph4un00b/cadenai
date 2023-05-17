@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { wait } from "@acme/shared";
 
 import { getTodos, nukeTodos, setTodo } from "~/services/todo";
-import { ClientButton } from "./disabled-btn";
+import { ClientButton } from "./disabled-button.client";
 
 export default async function Todos() {
 	const todos = await getTodos();

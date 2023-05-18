@@ -10,6 +10,6 @@ what's up? So, this here is just a repo for exercising AI and to learn about dif
 - [x] langchain/memory
 - [x] langchain/redis
 - [x] langchain/mysql
-- [ ] langchain/streaming
+- [x] langchain/streaming (pusher)
 
-- [ ] refactor
+- [x] openai/embeds

@@ -5,23 +5,28 @@ export async function wait(ms: number) {
 	return new Promise((resolve) => globalThis.setTimeout(resolve, ms));
 }
 
-// const cosineSimilarity = (A: number[], B: number[]): number => {
-// 	let dotProduct = 0;
-// 	let mA = 0;
-// 	let mB = 0;
+export const cosineSimilarity = (A: number[], B: number[]): number => {
+	let dotProduct = 0;
+	let mA = 0;
+	let mB = 0;
 
-// 	for (let i = 0; i < A.length; i++) {
-// 		dotProduct += A[i] * B[i];
-// 		mA += A[i] * A[i];
-// 		mB += B[i] * B[i];
-// 	}
+	const start = performance.now();
 
-// 	mA = Math.sqrt(mA);
-// 	mB = Math.sqrt(mB);
-// 	const similarity = dotProduct / (mA * mB);
+	for (let i = 0; i < A.length; i++) {
+		dotProduct += A[i]! * B[i]!;
+		mA += A[i]! * A[i]!;
+		mB += B[i]! * B[i]!;
+	}
 
-// 	return similarity;
-// };
+	mA = Math.sqrt(mA);
+	mB = Math.sqrt(mB);
+	const similarity = dotProduct / (mA * mB);
+
+	const end = performance.now();
+	console.log(`😱 cos-1 - ${end - start} ms`);
+
+	return similarity;
+};
 
 export const cosineSimilarity2 = (
 	A: number[] = [],
@@ -31,6 +36,8 @@ export const cosineSimilarity2 = (
 	let mA = 0;
 	let mB = 0;
 
+	const start = performance.now();
+
 	A.forEach((a, i) => {
 		dotProduct += a * B[i]!;
 		mA += a ** 2;
@@ -38,5 +45,8 @@ export const cosineSimilarity2 = (
 	});
 
 	const similarity = dotProduct / (Math.sqrt(mA) * Math.sqrt(mB));
+
+	const end = performance.now();
+	console.log(`😱 cos-2 - ${end - start} ms`);
 	return similarity;
 };

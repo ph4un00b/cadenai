@@ -8,7 +8,7 @@ import {
 	validatedActionAlt,
 	validatedAddTodo,
 	validatedNukeTodos,
-} from "~/app/(rpc)/actions";
+} from "~/app/(_rpc)/actions";
 
 export function ValidateButton({ text }: { text?: string }) {
 	const [pending, startTransition] = useTransition();

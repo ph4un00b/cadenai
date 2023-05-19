@@ -80,7 +80,7 @@ async function csvEmbed(payload: CSVEmbedIn) {
 	const openai = new OpenAIApi(configuration);
 
 	const start = performance.now();
-	const data = await csv({ flatKeys: true }).fromString(payload);
+	const data = await csv({}).fromString(payload);
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
 	const phrases = data.map((x) => x["phau_bot"]) as string[];
 

@@ -29,6 +29,7 @@ export function BotRules({ text }: { text: string }) {
 			>
 				create
 			</button>
+			
 			{/* <pre>{JSON.stringify(dict, null, 2)}</pre> */}
 		</section>
 	);

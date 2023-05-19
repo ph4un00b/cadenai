@@ -1,4 +1,4 @@
-import { EmbedCall, EmbedCompare } from "../(ui)/action.client";
+import { EmbedCompare } from "../(ui)/action.client";
 
 export default function Embeds() {
 	return (
@@ -7,7 +7,8 @@ export default function Embeds() {
 				<span className="text-pink-500">CadenAI 🤗!</span>
 			</h1>
 			<br />
-			<EmbedCall />
+			{/* <EmbedCall /> */}
+			<a href="/bot">bot</a>
 			<EmbedCompare />
 		</div>
 	);

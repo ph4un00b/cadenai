@@ -14,7 +14,7 @@ export function BotRules({ text }: { text: string }) {
 				ref={areaRef}
 				cols={60}
 				rows={16}
-				className="bg-slate-200 text-gray-900"
+				className="bg-slate-300 text-gray-900"
 				defaultValue={text}
 			></textarea>
 			<button

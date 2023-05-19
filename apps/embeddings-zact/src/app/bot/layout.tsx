@@ -1,8 +1,4 @@
-export default function TodosLayout({
-	children,
-}: {
-	children: React.ReactNode;
-}) {
+export default function BotLayout({ children }: { children: React.ReactNode }) {
 	console.log({ layout: true });
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-between p-24">

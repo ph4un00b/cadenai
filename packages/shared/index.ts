@@ -5,7 +5,10 @@ export async function wait(ms: number) {
 	return new Promise((resolve) => globalThis.setTimeout(resolve, ms));
 }
 
-export const cosineSimilarity = (A: number[], B: number[]): number => {
+export const cosineSimilarity = (
+	A: readonly number[],
+	B: readonly number[],
+): number => {
 	let dotProduct = 0;
 	let mA = 0;
 	let mB = 0;

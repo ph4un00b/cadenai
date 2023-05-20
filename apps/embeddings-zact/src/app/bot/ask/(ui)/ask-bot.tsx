@@ -24,28 +24,42 @@ import {
 export function AskBot() {
 	const [lowest, setLowest] = useState(Infinity);
 	const [highest, setHighest] = useState(-Infinity);
-	const inputRef = useRef<HTMLInputElement>(null);
-	const baseData = useRef<OutPhauSentences["payload"]>(null!);
+	const askInput = useRef<HTMLInputElement>(null);
 	const [pending, startTransition] = useTransition();
-	const [data, setData] = useState<
-		OutPhauSentences["payload"] | [string, number, readonly number[]][]
-	>(null!);
+	const { data, setData, ref: initialData } = useBotSentences();
 
-	useEffect(() => {
-		phauSentencesAction(undefined)
-			.then((response) => {
-				baseData.current = response.payload;
-				setData(response.payload);
-			})
-			.catch(console.error);
-	}, []);
+	const handleClick = () => {
+		const val = askInput.current!.value;
+		if (!val) return;
+
+		startTransition(async () => {
+			try {
+				const { payload } = await forAction(val);
+				let high = -Infinity;
+				let low = Infinity;
+
+				const comparisons = initialData.current.map(([texto, embed]) => {
+					const similarity = cosineSimilarity(embed, payload);
+					high = Math.max(high, similarity);
+					low = Math.min(low, similarity);
+					return [texto, similarity, embed] as [string, number, number[]];
+				});
+
+				setLowest(low);
+				setHighest(high);
+				setData(comparisons);
+			} catch (error) {
+				console.error(error);
+			}
+		});
+	};
 
 	return (
 		<>
 			<div className="space-y-1">
 				<Label htmlFor="ask">Question</Label>
 				<Input
-					ref={inputRef}
+					ref={askInput}
 					id="ask"
 					placeholder="ask me anything..."
 					defaultValue=""
@@ -54,36 +68,7 @@ export function AskBot() {
 			<br />
 			<button
 				disabled={pending}
-				onClick={() => {
-					const val = inputRef.current!.value;
-					if (!val) return;
-
-					startTransition(() => {
-						forAction(val)
-							.then((response) => {
-								let high = -Infinity;
-								let low = Infinity;
-
-								const comparisons = baseData.current.map((x) => {
-									const [texto, embed] = x;
-									const similarity = cosineSimilarity(embed, response.payload);
-
-									high = Math.max(high, similarity);
-									low = Math.min(low, similarity);
-									return [texto, similarity, embed] as [
-										string,
-										number,
-										number[],
-									];
-								});
-
-								setLowest(low);
-								setHighest(high);
-								setData(comparisons);
-							})
-							.catch(console.error);
-					});
-				}}
+				onClick={handleClick}
 				className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20 disabled:bg-indigo-600/80"
 			>
 				ask the bot 🤖
@@ -92,6 +77,24 @@ export function AskBot() {
 			{data && <TableDemo data={data} lowest={lowest} highest={highest} />}
 		</>
 	);
+}
+
+function useBotSentences() {
+	const [data, setData] = useState<
+		OutPhauSentences["payload"] | [string, number, readonly number[]][]
+	>(null!);
+	const ref = useRef<OutPhauSentences["payload"]>(null!);
+
+	useEffect(() => {
+		phauSentencesAction(undefined)
+			.then((response) => {
+				ref.current = response.payload;
+				setData(response.payload);
+			})
+			.catch(console.error);
+	}, []);
+
+	return { data, setData, ref };
 }
 
 function TableDemo({
@@ -109,21 +112,15 @@ function TableDemo({
 				<TableCaption>A list of your bot memory.</TableCaption>
 				<TableHeader>
 					<TableRow>
-						{/* <TableHead className="w-[100px]">Invoice</TableHead> */}
-
 						<TableHead>Texto</TableHead>
 						<TableHead>Embeddings</TableHead>
-
-						{/* <TableHead className="text-right">Amount</TableHead> */}
 					</TableRow>
 				</TableHeader>
 				<TableBody>
 					{data?.map((text) => (
 						<TableRow key={text[0]}>
-							{/* <TableCell className="font-medium">{invoice.invoice}</TableCell> */}
 							<TableCell>{text[0]}</TableCell>
 							<TableCell>{text[1][0]}</TableCell>
-							{/* <TableCell className="text-right">{invoice.totalAmount}</TableCell> */}
 						</TableRow>
 					))}
 				</TableBody>
@@ -136,17 +133,14 @@ function TableDemo({
 			<TableCaption>A list of your bot memory.</TableCaption>
 			<TableHeader>
 				<TableRow>
-					{/* <TableHead className="w-[100px]">Invoice</TableHead> */}
 					<TableHead>Texto</TableHead>
 					<TableHead>Similitud</TableHead>
 					<TableHead>Embeddings</TableHead>
-					{/* <TableHead className="text-right">Amount</TableHead> */}
 				</TableRow>
 			</TableHeader>
 			<TableBody>
 				{data?.map((text) => (
 					<TableRow key={text[0]}>
-						{/* <TableCell className="font-medium">{invoice.invoice}</TableCell> */}
 						<TableCell>{text[0]}</TableCell>
 						<TableCell
 							className={
@@ -160,7 +154,6 @@ function TableDemo({
 							{text[1]}
 						</TableCell>
 						<TableCell>{text[2][0]}</TableCell>
-						{/* <TableCell className="text-right">{invoice.totalAmount}</TableCell> */}
 					</TableRow>
 				))}
 			</TableBody>

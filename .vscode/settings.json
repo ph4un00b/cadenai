@@ -43,6 +43,7 @@
 		"todos",
 		"TRPC",
 		"upstash",
+		"waku",
 		"zact"
 	],
 	"workbench.colorCustomizations": {

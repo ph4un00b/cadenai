@@ -3,6 +3,7 @@ packages:
   - apps/chat-models
   - apps/nextjs
   - apps/embeddings-zact
+  - apps/waku-pdf
   - packages/api
   - packages/auth
   - packages/db

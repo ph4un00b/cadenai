@@ -52,7 +52,10 @@ function App({ name = "Anonymous" }) {
 	});
 
 	return (
-		<div style={{ border: "3px red dashed", margin: "1em", padding: "1em" }}>
+		<div
+			className="bg-slate-900"
+			style={{ border: "3px red dashed", margin: "1em", padding: "1em" }}
+		>
 			<h1>Hello {name}!!</h1>
 
 			<AskInput

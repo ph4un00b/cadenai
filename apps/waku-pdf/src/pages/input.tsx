@@ -6,19 +6,16 @@ import { cosineSimilarity } from "@acme/shared";
 
 import { type EmbedQuery, type PDFData } from "../App.js";
 
-export function AskInput({
-	pdfData,
-	embedFor,
-}: {
+type Ask = {
 	embedFor: (data: string) => Promise<EmbedQuery>;
 	pdfData: () => Promise<PDFData>;
-}) {
+};
+
+export function AskInput({ pdfData, embedFor }: Ask) {
 	const askInput = useRef<HTMLInputElement>(null);
 	const [lowest, setLowest] = useState(Infinity);
 	const [highest, setHighest] = useState(-Infinity);
-
 	const [isPending, startTransition] = useTransition();
-
 	const { reply, setReply, initialData } = useData({ pdfData });
 
 	const handleClick = () => {
@@ -79,16 +76,14 @@ type Reply = [string, number][];
 function useData({ pdfData }: { pdfData: () => Promise<PDFData> }) {
 	const [initialData, setData] = useState<PDFData["payload"]>(null!);
 	const [reply, setReply] = useState<Reply>(null!);
-	//   const ref = useRef<PDFData["payload"]>(null!);
 
 	useEffect(() => {
 		pdfData()
 			.then((response) => {
-				// ref.current = response?.payload;
 				setData(response?.payload);
 			})
 			.catch(console.error);
-	}, []);
+	}, [pdfData]);
 
 	return { reply, setReply, initialData };
 }

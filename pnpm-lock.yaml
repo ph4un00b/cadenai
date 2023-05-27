@@ -402,6 +402,9 @@ importers:
 
   apps/waku-pdf:
     dependencies:
+      '@acme/shared':
+        specifier: ^0.1.0
+        version: link:../../packages/shared
       express:
         specifier: ^4.18.2
         version: 4.18.2

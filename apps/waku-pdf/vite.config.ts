@@ -5,6 +5,9 @@ import { defineConfig } from "waku/config";
 
 console.log("vite dev!!");
 export default defineConfig({
+	optimizeDeps: {
+		include: ["@acme/shared"],
+	},
 	plugins: [
 		topLevelAwait({
 			// The export name of top-level await promise for each chunk module

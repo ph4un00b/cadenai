@@ -6,7 +6,7 @@ import { defineConfig } from "waku/config";
 console.log("vite dev!!");
 export default defineConfig({
 	optimizeDeps: {
-		include: ["@acme/shared"],
+		include: ["@acme/shared", "@acme/tailwind-config"],
 	},
 	plugins: [
 		topLevelAwait({

@@ -53,3 +53,18 @@ export const cosineSimilarity2 = (
 	console.log(`😱 cos-2 - ${end - start} ms`);
 	return similarity;
 };
+
+export function cosineSimilarity3(a: number[], b: number[]) {
+	return dotProduct(a, b) / (magnitude(a) * magnitude(b));
+}
+
+function dotProduct(a: number[], b: number[]) {
+	return a.reduce(
+		(acc: number, val: number, i: number) => acc + val * b[i]!,
+		0,
+	);
+}
+
+function magnitude(a: number[]) {
+	return Math.sqrt(dotProduct(a, a));
+}

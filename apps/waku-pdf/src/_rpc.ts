@@ -4,6 +4,8 @@ import { Document } from "langchain/document";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { CharacterTextSplitter } from "langchain/text_splitter";
 
+import { wait } from "@acme/shared";
+
 export function greet(name: string) {
 	console.log("hola! ", name);
 
@@ -53,6 +55,7 @@ export async function pdfData() {
 }
 
 export async function embedFor(payload: string) {
+	await wait(2000);
 	// const configuration = new Configuration({
 	// 	apiKey: env.OPENAI_API_KEY,
 	// });

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 
+import { cosineSimilarity } from "@acme/shared";
+
 import { type EmbedQuery, type PDFData } from "../App.js";
 
 export function AskInput({
@@ -23,28 +25,27 @@ export function AskInput({
 		const val = askInput.current!.value;
 		if (!val) return;
 
-		startTransition(async () => {
-			try {
-				const { payload } = await embedFor(val);
-				let high = -Infinity;
-				let low = Infinity;
+		startTransition(() => {
+			embedFor(val)
+				.then((res) => {
+					const { payload } = res;
+					let high = -Infinity;
+					let low = Infinity;
+					if (!initialData) return;
 
-				if (!initialData) return;
+					const comparisons: Reply = initialData.embedding.map((x, idx) => {
+						const similarity = cosineSimilarity(x, payload);
+						high = Math.max(high, similarity);
+						low = Math.min(low, similarity);
 
-				const comparisons: Reply = initialData.embedding.map((x, idx) => {
-					const similarity = cosineSimilarity(x, payload);
-					high = Math.max(high, similarity);
-					low = Math.min(low, similarity);
+						return [initialData.textos[idx]!, similarity];
+					});
 
-					return [initialData.textos[idx]!, similarity];
-				});
-
-				setLowest(low);
-				setHighest(high);
-				setReply(comparisons);
-			} catch (error) {
-				console.error(error);
-			}
+					setLowest(low);
+					setHighest(high);
+					setReply(comparisons);
+				})
+				.catch(console.error);
 		});
 	};
 
@@ -52,7 +53,18 @@ export function AskInput({
 		<div style={{ border: "3px blue dashed", margin: "1em", padding: "1em" }}>
 			<p>ask pdf</p>
 			<input ref={askInput} type="text" minLength={30} />
-			<button onClick={handleClick}>ask ✨</button>
+			<button
+				disabled={isPending}
+				style={{
+					backgroundColor: isPending ? "whitesmoke" : "royalblue",
+					cursor: isPending ? "not-allowed" : "",
+					opacity: "0.8",
+					color: isPending ? "black" : "whitesmoke",
+				}}
+				onClick={handleClick}
+			>
+				ask ✨
+			</button>
 
 			{reply && <pre>lowest: {lowest}</pre>}
 			{reply && <pre>highest: {highest}</pre>}
@@ -77,19 +89,4 @@ function useData({ pdfData }: { pdfData: () => Promise<PDFData> }) {
 	}, []);
 
 	return { reply, setReply, initialData };
-}
-
-export function cosineSimilarity(a: number[], b: number[]) {
-	return dotProduct(a, b) / (magnitude(a) * magnitude(b));
-}
-
-function dotProduct(a: number[], b: number[]) {
-	return a.reduce(
-		(acc: number, val: number, i: number) => acc + val * b[i]!,
-		0,
-	);
-}
-
-function magnitude(a: number[]) {
-	return Math.sqrt(dotProduct(a, a));
 }

@@ -5,6 +5,9 @@ import { defineConfig } from "waku/config";
 
 console.log("vite dev!!");
 export default defineConfig({
+	server: {
+		host: "0.0.0.0",
+	},
 	optimizeDeps: {
 		include: ["@acme/shared", "@acme/tailwind-config"],
 	},

@@ -50,7 +50,9 @@ export function AskInput({
 	};
 
 	return (
-		<div style={{ border: "3px blue dashed", margin: "1em", padding: "1em" }}>
+		<div
+		// style={{ border: "3px blue dashed", margin: "1em", padding: "1em" }}
+		>
 			<p>ask pdf</p>
 			<input ref={askInput} type="text" minLength={30} />
 			<button

@@ -53,10 +53,10 @@ function App({ name = "Anonymous" }) {
 
 	return (
 		<div
-			className="bg-slate-900"
-			style={{ border: "3px red dashed", margin: "1em", padding: "1em" }}
+			className="mx-auto w-[90%] border-2 border-dashed border-rose-700 bg-slate-700"
+			// style={{ border: "3px red dashed", margin: "1em", padding: "1em" }}
 		>
-			<h1>Hello {name}!!</h1>
+			<h1 className="text-4xl">Hello {name}!!</h1>
 
 			<AskInput
 				embedFor={embedFor as unknown as ServerFunction<EmbedQuery>}

@@ -9,7 +9,7 @@ export default defineConfig({
 		host: "0.0.0.0",
 	},
 	optimizeDeps: {
-		include: ["@acme/shared", "@acme/tailwind-config"],
+		include: ["@acme/shared", "@acme/tailwind-config", "@acme/shadcn"],
 	},
 	plugins: [
 		topLevelAwait({

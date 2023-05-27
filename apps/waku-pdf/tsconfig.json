@@ -9,7 +9,10 @@
 		"skipLibCheck": true,
 		"noUncheckedIndexedAccess": true,
 		"exactOptionalPropertyTypes": true,
-		"jsx": "react-jsx"
+		"jsx": "react-jsx",
+		"paths": {
+			"~/*": ["./src/*"]
+		}
 	}
 	// "include": [".eslintrc.js", "prettier.config.cjs"]
 }

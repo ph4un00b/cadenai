@@ -1,7 +1,4 @@
 import { Suspense } from "react";
-import { Document, DocumentInput } from "langchain/document";
-import { PDFLoader } from "langchain/document_loaders/fs/pdf";
-import { CharacterTextSplitter } from "langchain/text_splitter";
 
 import {
 	Counter,
@@ -17,37 +14,11 @@ type ServerFunction<T> = T extends (...args: infer A) => infer R
 	? (...args: A) => Promise<R>
 	: never;
 
-const loader = new PDFLoader("src/sample/phauf.pdf");
-
-const pages = await loader.loadAndSplit();
-
-const splitter = new CharacterTextSplitter({
-	separator: ".\n",
-	chunkSize: 400,
-	// chunkOverlap: 3,
-});
-
 export type PDFData = Awaited<ReturnType<typeof pdfData>>;
 export type EmbedQuery = Awaited<ReturnType<typeof embedFor>>;
 
 function App({ name = "Anonymous" }) {
-	const delayedMessage = new Promise<string>(async (resolve) => {
-		// if (!pages[0]?.pageContent) return;
-		// const output = await splitter.splitDocuments(pages);
-		// // console.log({ output });
-
-		// const dataSheet: { textos: string[]; embedding: number[] } = {
-		//   textos: [],
-		//   embedding: [],
-		// };
-		// for (const doc of output) {
-		//   dataSheet.textos.push(doc.pageContent);
-		//   dataSheet.embedding = Array(1536)
-		//     .fill(undefined)
-		//     .map(() => Math.random());
-		// }
-		// console.log({ dataSheet });
-
+	const delayedMessage = new Promise<string>((resolve) => {
 		setTimeout(() => resolve("Hello from server 💃💃!"), 2000);
 	});
 
@@ -88,9 +59,11 @@ function App({ name = "Anonymous" }) {
 	);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const ServerMessage = (async () => {
 	await new Promise((resolve) => setTimeout(resolve, 1000));
 	return <p style={{ color: "red" }}>Hello from server!</p>;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 }) as any; // FIXME how can we type async component?
 
 export default App;

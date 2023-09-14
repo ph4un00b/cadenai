@@ -5,8 +5,8 @@ import { QuillBinding } from "y-quill";
 
 import "quill/dist/quill.snow.css";
 import { useState } from "react";
-import { useAwareness, useText } from "@/app/react-yjs";
 import { LinkIcon } from "@heroicons/react/24/outline";
+import { useAwareness, useText } from "@y-sweet/react";
 
 export function TextEditor() {
 	const yText = useText("text", { observe: "none" });

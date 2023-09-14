@@ -14,10 +14,7 @@ import type { Awareness } from "y-protocols/awareness";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
-import {
-	WebsocketProviderParams,
-	createYjsProvider,
-} from "./yjs-provider";
+import { WebsocketProviderParams, createYjsProvider } from "./yjs-provider";
 
 export { createYjsProvider, type WebsocketProviderParams };
 

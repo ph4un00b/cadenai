@@ -1,7 +1,7 @@
 import { CONNECTION_STRING } from "@/lib/config";
-import { YDocProvider } from "@y-sweet/react";
 import { getOrCreateDoc } from "@y-sweet/sdk";
 
+import { YDocProvider } from "../../lib/react-yjs";
 import { TextEditor } from "./text-editor";
 
 type HomeProps = {

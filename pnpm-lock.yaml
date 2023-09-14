@@ -502,9 +502,6 @@ importers:
       '@uiw/react-color':
         specifier: 1.3.3
         version: 1.3.3(@babel/runtime@7.21.0)(react-dom@18.2.0)(react@18.2.0)
-      '@y-sweet/react':
-        specifier: 0.0.7
-        version: 0.0.7(react@18.2.0)(yjs@13.6.7)
       '@y-sweet/sdk':
         specifier: 0.0.7
         version: 0.0.7
@@ -6774,22 +6771,6 @@ packages:
 
   /@xtuc/long@4.2.2:
     resolution: {integrity: sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==}
-    dev: false
-
-  /@y-sweet/react@0.0.7(react@18.2.0)(yjs@13.6.7):
-    resolution: {integrity: sha512-avKeHIR00+Nz8iohnSyUw/JN9IAVj2/BtYaprPRih9qpM+7Xr+sOxyaiADbGMkyFN3In8Ms2FdOkB34o/hNwFA==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      yjs: ^13.0.0
-    dependencies:
-      '@y-sweet/sdk': 0.0.7
-      react: 18.2.0
-      y-protocols: 1.0.5
-      y-websocket: 1.5.0(yjs@13.6.7)
-      yjs: 13.6.7
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
     dev: false
 
   /@y-sweet/sdk@0.0.7:

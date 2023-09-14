@@ -1,9 +1,11 @@
 packages:
+  - apps/yjs-react
   - apps/expo
   - apps/chat-models
   - apps/nextjs
   - apps/embeddings-zact
   - apps/waku-pdf
+  - packages/shadcn
   - packages/api
   - packages/auth
   - packages/db

@@ -40,7 +40,7 @@ export function TextEditor() {
 					],
 				},
 			});
-			bindingRef.current = new QuillBinding(yText!, quill, awareness!);
+			bindingRef.current = new QuillBinding(yText, quill, awareness);
 		}
 	}, [yText, awareness]);
 	// }, []);

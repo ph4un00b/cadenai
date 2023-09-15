@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "y-sweet",
+    "y-sweet-core",
+]
+
+exclude = [
+    "y-sweet-worker",
+]

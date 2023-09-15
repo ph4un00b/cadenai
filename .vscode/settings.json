@@ -48,6 +48,7 @@
 		"TRPC",
 		"upstash",
 		"waku",
+		"ytree",
 		"zact"
 	],
 	"workbench.colorCustomizations": {

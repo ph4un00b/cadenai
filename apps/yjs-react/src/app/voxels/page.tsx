@@ -1,18 +1,19 @@
-import { CONNECTION_STRING } from '@/lib/config'
-import { VoxelEditor } from './VoxelEditor'
-import { YDocProvider } from '@y-sweet/react'
-import { getOrCreateDoc } from '@y-sweet/sdk'
+import { getOrCreateDoc } from "@y-sweet/sdk";
+
+import { CONNECTION_STRING } from "~/lib/config";
+import { YDocProvider } from "~/lib/react-yjs";
+import { VoxelEditor } from "./VoxelEditor";
 
 type HomeProps = {
-  searchParams: Record<string, string>
-}
+	searchParams: Record<string, string>;
+};
 
 export default async function Home({ searchParams }: HomeProps) {
-  const clientToken = await getOrCreateDoc(searchParams.doc, CONNECTION_STRING)
+	const clientToken = await getOrCreateDoc(searchParams.doc, CONNECTION_STRING);
 
-  return (
-    <YDocProvider clientToken={clientToken} setQueryParam="doc">
-      <VoxelEditor />
-    </YDocProvider>
-  )
+	return (
+		<YDocProvider clientToken={clientToken} setQueryParam="doc">
+			<VoxelEditor />
+		</YDocProvider>
+	);
 }

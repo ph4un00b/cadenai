@@ -1,7 +1,13 @@
-## apps
+# apps
 
 - pnpm dev --filter=chat-models
 - (cadenai) pnpm dev --filter=nextjs
+
+## yjs-react
+
+- pnpm dev:yjs
+- in \_rustic/y-sweet/: cargo run --serve --port 8080 --host '127.0.0.1'
+- or in \_rustic/y-sweet-worker/: npm run dev
 
 ## db
 
